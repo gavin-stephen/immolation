@@ -1,0 +1,673 @@
+[02:01:30] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 1.21.4 with Fabric Loader 0.16.14
+[02:01:30] [main/INFO] (FabricLoader) Loading 55 mods:
+	- fabric-api 0.119.3+1.21.4
+	- fabric-api-base 0.4.54+b47eab6b04
+	- fabric-api-lookup-api-v1 1.6.86+b1caf1e904
+	- fabric-biome-api-v1 15.0.6+b1c29d8e04
+	- fabric-block-api-v1 1.0.31+7feeb73304
+	- fabric-block-view-api-v2 1.0.20+9c49cc8c04
+	- fabric-blockrenderlayer-v1 2.0.8+7feeb73304
+	- fabric-client-gametest-api-v1 4.1.1+6816ccd404
+	- fabric-client-tags-api-v1 1.1.29+20ea1e2304
+	- fabric-command-api-v1 1.2.62+f71b366f04
+	- fabric-command-api-v2 2.2.41+e496eb1504
+	- fabric-commands-v0 0.2.79+df3654b304
+	- fabric-content-registries-v0 9.1.19+25d1a67604
+	- fabric-convention-tags-v1 2.1.20+7f945d5b04
+	- fabric-convention-tags-v2 2.14.1+aebda09404
+	- fabric-crash-report-info-v1 0.3.6+7feeb73304
+	- fabric-data-attachment-api-v1 1.6.2+e99da0f704
+	- fabric-data-generation-api-v1 22.3.1+0f4e5f5504
+	- fabric-dimensions-v1 4.0.10+7feeb73304
+	- fabric-entity-events-v1 2.0.15+62245bef04
+	- fabric-events-interaction-v0 4.0.4+a4eebcf004
+	- fabric-game-rule-api-v1 1.0.63+7d48d43904
+	- fabric-gametest-api-v1 2.0.26+7feeb73304
+	- fabric-item-api-v1 11.3.0+ee91fa1f04
+	- fabric-item-group-api-v1 4.2.2+fcb9601404
+	- fabric-key-binding-api-v1 1.0.57+7d48d43904
+	- fabric-keybindings-v0 0.2.55+df3654b304
+	- fabric-lifecycle-events-v1 2.5.4+bf2a60eb04
+	- fabric-loot-api-v2 3.0.38+3f89f5a504
+	- fabric-loot-api-v3 1.0.26+203e6b2304
+	- fabric-message-api-v1 6.0.26+238a33c004
+	- fabric-model-loading-api-v1 4.3.0+ae23723504
+	- fabric-networking-api-v1 4.4.0+db5e668204
+	- fabric-object-builder-api-v1 18.0.14+38b0d59804
+	- fabric-particles-v1 4.0.14+7feeb73304
+	- fabric-recipe-api-v1 8.1.1+640e77ae04
+	- fabric-registry-sync-v0 6.1.11+4a9c1ece04
+	- fabric-renderer-api-v1 5.0.3+50f0feb204
+	- fabric-renderer-indigo 2.0.3+50f0feb204
+	- fabric-rendering-data-attachment-v1 0.3.58+73761d2e04
+	- fabric-rendering-fluids-v1 3.1.19+7feeb73304
+	- fabric-rendering-v1 10.2.1+0d31b09f04
+	- fabric-resource-conditions-api-v1 5.0.13+203e6b2304
+	- fabric-resource-loader-v0 3.1.1+360374ac04
+	- fabric-screen-api-v1 2.0.38+7feeb73304
+	- fabric-screen-handler-api-v1 1.3.118+7feeb73304
+	- fabric-sound-api-v1 1.0.32+7feeb73304
+	- fabric-tag-api-v1 1.0.7+7d48d43904
+	- fabric-transfer-api-v1 5.4.9+efa825c904
+	- fabric-transitive-access-wideners-v1 6.3.2+56e78b9b04
+	- fabricloader 0.16.14
+	- immolation 1.0-SNAPSHOT
+	- java 21
+	- minecraft 1.21.4
+	- mixinextras 0.4.1
+[02:01:30] [main/INFO] (FabricLoader/Mixin) SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/C:/Users/rstep/IdeaProjects/columbinaAddons/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.5+mixin.0.8.7/22f9eb729e216a091673a574a5906dc1b9027fb3/sponge-mixin-0.15.5+mixin.0.8.7.jar Service=Knot/Fabric Env=CLIENT
+[02:01:30] [main/INFO] (FabricLoader/Mixin) Loaded Fabric development mappings for mixin remapper!
+[02:01:30] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_21
+[02:01:32] [main/INFO] (FabricLoader/MixinExtras|Service) Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.4.1).
+[02:01:33] [Datafixer Bootstrap/INFO] (Minecraft) 243 Datafixer optimizations took 446 milliseconds
+[02:01:38] [Render thread/INFO] (Minecraft) Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[02:01:38] [Render thread/INFO] (Minecraft) Setting user: Player497
+[02:01:38] [Render thread/INFO] (Indigo) [Indigo] Registering Indigo renderer!
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: size = 56
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Apocalypse: {"Main":{"lifeSteal":70.0,"3rdSpellCost":13.0,"healthRegen":9.0,"exploding":5.0,"fireDefence":2.0,"waterDefence":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 70.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 3rdSpellCost: 13.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 9.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: exploding: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: fireDefence: 2.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: waterDefence: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Hero: {"Main":{"walkSpeed":85.0,"healthRegen":14.0,"mainAttackDamage":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 85.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 14.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: mainAttackDamage: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Guardian: {"Main":{"rawHealth":98.0,"healthRegenRaw":2.0},"Raids":{"rawHealth":55.0,"healthRegenRaw":40.0,"manaRegen":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 98.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegenRaw: 2.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Alkatraz: {"Main":{"earthDamage":45.0,"mainAttackDamage":45.0,"exploding":10.0},"Spell":{"earthDamage":98.0,"mainAttackDamage":1.0,"exploding":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: earthDamage: 45.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: mainAttackDamage: 45.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: exploding: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Idol: {"Main":{"raw2ndSpellCost":49.0,"rawSpellDamage":40.0,"manaRegen":10.0,"reflection":1.0},"Utility":{"raw2ndSpellCost":65.0,"manaRegen":30.0,"reflection":4.0,"rawSpellDamage":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw2ndSpellCost: 49.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawSpellDamage: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: reflection: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Thrundacrack: {"Main":{"raw3rdSpellCost":50.0,"thunderDamage":35.0,"walkSpeed":14.0,"healthRegen":1.0},"Water":{"raw3rdSpellCost":35.0,"thunderDamage":35.0,"waterDamage":22.5,"walkSpeed":6.5,"healthRegen":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw3rdSpellCost: 50.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: thunderDamage: 35.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 14.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Collapse: {"Main":{"manaSteal":79.0,"elementalDefence":20.0,"mainAttackDamage":1.0},"Melee":{"mainAttackDamage":85.0,"manaSteal":14.0,"elementalDefence":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 79.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: elementalDefence: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: mainAttackDamage: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Convergence: {"Main":{"3rdSpellCost":60.0,"thunderDamage":20.0,"earthDamage":19.0,"healthRegen":1.0},"Pala":{"3rdSpellCost":60.0,"healthRegen":25.0,"thunderDamage":8.0,"earthDamage":7.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 3rdSpellCost: 60.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: thunderDamage: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: earthDamage: 19.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Az: {"Main":{"1stSpellCost":40.0,"fireDamage":30.0,"waterDamage":30.0},"Fire":{"1stSpellCost":60.0,"fireDamage":39.0,"waterDamage":1.0},"Water":{"1stSpellCost":60.0,"waterDamage":39.0,"fireDamage":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 1stSpellCost: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: fireDamage: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: waterDamage: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Freedom: {"Main":{"rawHealth":30.0,"walkSpeed":25.0,"rawSpellDamage":25.0,"manaRegen":20.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawSpellDamage: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Grandmother: {"Main":{"spellDamage":60.0,"healthRegen":35.0,"walkSpeed":5.0},"HprRaw":{"healthRegenRaw":55.0,"spellDamage":35.0,"healthRegen":5.0,"walkSpeed":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: spellDamage: 60.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 35.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Ignis: {"Main":{"healthRegenRaw":40.0,"healthRegen":25.0,"rawHealth":25.0,"4thSpellCost":10.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegenRaw: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 4thSpellCost: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Divzer: {"Main":{"manaSteal":70.0,"lifeSteal":20.0,"rawSpellDamage":10.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 70.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawSpellDamage: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Spring: {"Main":{"manaRegen":50.0,"waterDamage":40.0,"weakenEnemy":5.0,"thunderDamage":5.0},"Debuff":{"manaRegen":35.0,"weakenEnemy":25.0,"slowEnemy":19.0,"waterDamage":19.0,"thunderDamage":2.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 50.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: waterDamage: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: weakenEnemy: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: thunderDamage: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Stratiformis: {"Main":{"walkSpeed":80.0,"rawHealth":18.0,"spellDamage":2.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 80.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 18.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: spellDamage: 2.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Epoch: {"Main":{"rawMainAttackDamage":40.0,"lifeSteal":30.0,"walkSpeed":15.0,"raw4thSpellCost":10.0,"spellDamage":5.0},"Hmelee":{"rawMainAttackDamage":40.0,"lifeSteal":35.0,"raw1stSpellCost":10.0,"raw4thSpellCost":5.0,"spellDamage":5.0,"manaSteal":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawMainAttackDamage: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw4thSpellCost: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: spellDamage: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Pure: {"Main":{"spellDamage":65.0,"manaSteal":22.5,"xpBonus":12.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: spellDamage: 65.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 22.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: xpBonus: 12.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Lament: {"Main":{"waterDamage":50.0,"manaSteal":22.5,"healingEfficiency":17.5,"1stSpellCost":10.0},"War":{"waterDamage":37.5,"healingEfficiency":30.0,"manaSteal":22.5,"1stSpellCost":10.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: waterDamage: 50.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 22.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healingEfficiency: 17.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 1stSpellCost: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Gaia: {"Main":{"rawMainAttackDamage":50.0,"mainAttackDamage":30.0,"poison":20.0},"Spell":{"raw4thSpellCost":80.0,"poison":16.5,"rawMainAttackDamage":2.5,"mainAttackDamage":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawMainAttackDamage: 50.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: mainAttackDamage: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: poison: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Monster: {"Main":{"rawHealth":37.5,"manaSteal":27.5,"fireDamage":25.0,"raw1stSpellCost":5.0,"lifeSteal":5.0},"War":{"rawHealth":37.5,"manaSteal":27.5,"fireDamage":17.5,"lifeSteal":12.5,"raw1stSpellCost":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 37.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 27.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: fireDamage: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw1stSpellCost: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Singularity: {"Main":{"rawSpellDamage":40.0,"walkSpeed":25.0,"healthRegenRaw":10.0,"spellDamage":10.0,"rawMainAttackDamage":10.0,"mainAttackDamage":5.0},"Melee":{"rawMainAttackDamage":32.5,"mainAttackDamage":25.0,"walkSpeed":20.0,"healthRegenRaw":15.0,"rawSpellDamage":5.0,"spellDamage":2.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawSpellDamage: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegenRaw: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: spellDamage: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawMainAttackDamage: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: mainAttackDamage: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Fatal: {"Main":{"spellDamage":60.0,"walkSpeed":20.0,"2ndSpellCost":15.0,"manaSteal":5.0},"Riftwalker":{"spellDamage":40.0,"1stSpellCost":25.0,"2ndSpellCost":15.0,"manaSteal":10.0,"walkSpeed":10.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: spellDamage: 60.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 2ndSpellCost: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Warp: {"Main":{"healthRegenRaw":45.0,"walkSpeed":25.0,"manaRegen":20.0,"airDamage":7.5,"healthRegen":2.5},"Lightbender":{"manaRegen":30.0,"walkSpeed":30.0,"healingEfficiency":25.0,"healthRegenRaw":7.5,"airDamage":5.0,"healthRegen":2.5},"Lootrun":{"walkSpeed":25.0,"healthRegenRaw":25.0,"manaRegen":22.5,"raw2ndSpellCost":10.0,"healthRegen":7.5,"healingEfficiency":5.0,"airDamage":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegenRaw: 45.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: airDamage: 7.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Quetzalcoatl: {"Main":{"rawSpellDamage":55.0,"walkSpeed":30.0,"lifeSteal":15.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawSpellDamage: 55.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Aftershock: {"Main":{"rawHealth":70.0,"earthDamage":25.0,"4thSpellCost":5.0},"Raid":{"earthDamage":60.0,"4thSpellCost":25.0,"rawHealth":15.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 70.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: earthDamage: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 4thSpellCost: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Olympic: {"Main":{"jumpHeight":35.0,"walkSpeed":30.0,"airDamage":17.5,"raw1stSpellCost":15.0,"raw2ndSpellCost":2.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: jumpHeight: 35.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: airDamage: 17.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw1stSpellCost: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw2ndSpellCost: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Hadal: {"Main":{"spellDamage":62.5,"manaRegen":20.0,"3rdSpellCost":10.0,"4thSpellCost":6.5,"rawMaxMana":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: spellDamage: 62.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 3rdSpellCost: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 4thSpellCost: 6.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawMaxMana: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Sunstar: {"Main":{"rawMainAttackDamage":60.0,"thunderDamage":30.0,"lifeSteal":10.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawMainAttackDamage: 60.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: thunderDamage: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Toxoplasmosis: {"Main":{"poison":80.0,"lootBonus":15.0,"walkSpeed":5.0},"Combat":{"poison":89.0,"walkSpeed":7.5,"manaSteal":2.5,"lifeSteal":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: poison: 80.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lootBonus: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Fantasia: {"Main":{"3rdSpellCost":27.5,"spellDamage":22.5,"manaRegen":20.0,"4thSpellCost":15.0,"1stSpellCost":8.0,"manaSteal":6.0,"2ndSpellCost":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 3rdSpellCost: 27.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: spellDamage: 22.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 4thSpellCost: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 1stSpellCost: 8.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 6.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 2ndSpellCost: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Absolution: {"Main":{"healingEfficiency":50.0,"rawHealth":22.5,"manaRegen":17.5,"raw1stSpellCost":9.0,"fireDamage":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healingEfficiency: 50.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 22.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 17.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw1stSpellCost: 9.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: fireDamage: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Immolation: {"Main":{"fireDamage":33.0,"airDamage":33.0,"3rdSpellCost":33.0,"healthRegen":1.0},"Hpr%":{"healthRegen":26.5,"fireDamage":25.0,"airDamage":25.0,"3rdSpellCost":23.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: fireDamage: 33.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: airDamage: 33.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 3rdSpellCost: 33.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Archangel: {"Main":{"walkSpeed":32.5,"rawHealth":22.5,"healthRegen":17.5,"healthRegenRaw":17.5,"mainAttackRange":10.0},"Utility":{"walkSpeed":70.0,"rawHealth":10.0,"healthRegen":10.0,"healthRegenRaw":10.0},"Tank":{"healthRegenRaw":32.5,"healthRegen":32.5,"rawHealth":25.0,"walkSpeed":10.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 32.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 22.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 17.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegenRaw: 17.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: mainAttackRange: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Nullification: {"Main":{"elementalDefence":67.0,"lifeSteal":14.0,"manaSteal":14.0,"reflection":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: elementalDefence: 67.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 14.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 14.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: reflection: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Cataclysm: {"Main":{"raw1stSpellCost":70.0,"thunderDamage":20.0,"rawHealth":10.0},"Raids":{"rawHealth":50.0,"raw1stSpellCost":30.0,"thunderDamage":19.0,"stealing":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw1stSpellCost: 70.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: thunderDamage: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Grimtrap: {"Main":{"raw4thSpellCost":70.0,"raw2ndSpellCost":15.0,"poison":10.0,"manaSteal":2.5,"lifeSteal":2.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw4thSpellCost: 70.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw2ndSpellCost: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: poison: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Weathered: {"Main":{"airDamage":45.0,"walkSpeed":40.0,"manaSteal":15.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: airDamage: 45.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Inferno: {"Main":{"rawMainAttackDamage":45.0,"walkSpeed":20.0,"fireDamage":15.0,"rawHealth":15.0,"raw1stSpellCost":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawMainAttackDamage: 45.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: fireDamage: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw1stSpellCost: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Nirvana: {"Main":{"spellDamage":42.5,"manaRegen":30.0,"rawHealth":25.0,"manaSteal":2.5},"Acrobat":{"spellDamage":45.0,"manaRegen":28.0,"rawHealth":24.5,"manaSteal":2.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: spellDamage: 42.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Oblivion: {"Main":{"manaSteal":45.0,"manaRegen":30.0,"rawSpellDamage":17.5,"raw2ndSpellCost":5.0,"exploding":2.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 45.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawSpellDamage: 17.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw2ndSpellCost: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: exploding: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Discoverer: {"Main":{"lootBonus":99.0,"xpBonus":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lootBonus: 99.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: xpBonus: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Crusade Sabatons: {"Main":{"rawHealth":85.0,"healthRegen":10.0,"walkSpeed":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 85.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Resurgence: {"Main":{"manaRegen":40.0,"spellDamage":35.0,"healthRegenRaw":15.0,"walkSpeed":10.0},"Utility":{"manaRegen":45.0,"healthRegenRaw":30.0,"spellDamage":20.0,"walkSpeed":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: spellDamage: 35.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegenRaw: 15.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Galleon: {"Main":{"manaSteal":30.5,"earthDamage":29.0,"waterDamage":28.0,"poison":10.0,"mainAttackDamage":2.5},"Greed":{"manaSteal":25.0,"earthDamage":24.0,"waterDamage":23.5,"poison":15.0,"stealing":10.0,"lootBonus":2.5,"mainAttackDamage":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 30.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: earthDamage: 29.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: waterDamage: 28.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: poison: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: mainAttackDamage: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Boreal: {"Main":{"healthRegen":50.0,"healthRegenRaw":33.0,"manaRegen":10.0,"walkSpeed":5.0,"thunderDamage":1.0,"earthDamage":1.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegen: 50.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegenRaw: 33.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: thunderDamage: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: earthDamage: 1.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Slayer: {"Main":{"3rdSpellCost":47.5,"walkSpeed":25.0,"healthRegenRaw":20.0,"rawMainAttackDamage":5.0,"stealing":2.5},"Melee":{"rawMainAttackDamage":37.5,"walkSpeed":25.0,"healthRegenRaw":20.0,"3rdSpellCost":15.0,"stealing":2.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 3rdSpellCost: 47.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: healthRegenRaw: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawMainAttackDamage: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: stealing: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Moontower: {"Main":{"walkSpeed":95.0,"airDefence":2.5,"waterDefence":2.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 95.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: airDefence: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: waterDefence: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Dawnbreak: {"Main":{"rawMainAttackDamage":55.0,"manaSteal":12.5,"thunderDamage":12.5,"fireDamage":10.0,"lifeSteal":7.5,"exploding":2.5},"Spell":{"fireDamage":27.5,"thunderDamage":27.5,"manaSteal":22.5,"lifeSteal":20.0,"rawMainAttackDamage":2.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawMainAttackDamage: 55.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 12.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: thunderDamage: 12.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: fireDamage: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 7.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: exploding: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Stardew: {"Main":{"rawSpellDamage":35.0,"waterDamage":25.0,"manaRegen":20.0,"thunderDamage":20.0},"Spellsteal":{"rawSpellDamage":30.0,"manaSteal":25.0,"waterDamage":18.0,"thunderDamage":16.0,"manaRegen":11.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawSpellDamage: 35.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: waterDamage: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: thunderDamage: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Warchief: {"Main":{"mainAttackDamage":38.0,"thunderDamage":30.0,"rawMainAttackDamage":17.0,"walkSpeed":10.0,"exploding":5.0},"Earth":{"mainAttackDamage":35.0,"earthDamage":32.5,"rawMainAttackDamage":17.5,"walkSpeed":10.0,"exploding":5.0},"Spell":{"thunderDamage":52.5,"earthDamage":42.5,"walkSpeed":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: mainAttackDamage: 38.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: thunderDamage: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawMainAttackDamage: 17.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: exploding: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Revenant: {"Main":{"airDamage":40.0,"4thSpellCost":32.5,"walkSpeed":20.0,"earthDamage":2.5},"Earth":{"earthDamage":25.0,"airDamage":25.0,"walkSpeed":25.0,"4thSpellCost":10.0,"manaSteal":7.5,"rawHealth":6.5,"reflection":1.0},"Melee":{"rawMainAttackDamage":35.0,"walkSpeed":15.0,"rawHealth":15.0,"mainAttackDamage":15.0,"airDamage":12.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: airDamage: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 4thSpellCost: 32.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: earthDamage: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Bloodbath: {"Main":{"raw1stSpellCost":40.0,"walkSpeed":30.0,"rawHealth":25.0,"lifeSteal":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: raw1stSpellCost: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 30.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: rawHealth: 25.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Trance: {"Main":{"manaSteal":70.0,"walkSpeed":20.0,"lifeSteal":10.0},"Melee":{"manaSteal":40.0,"rawAttackSpeed":35.0,"walkSpeed":12.5,"lifeSteal":12.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 70.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: walkSpeed: 20.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: lifeSteal: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Labyrinth: {"Main":{"fireDamage":47.5,"earthDamage":40.0,"3rdSpellCost":10.0,"manaSteal":2.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: fireDamage: 47.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: earthDamage: 40.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 3rdSpellCost: 10.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaSteal: 2.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Hanafubuki: {"Main":{"elementalDamage":75.0,"3rdSpellCost":12.5,"4thSpellCost":7.5,"jumpHeight":5.0}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: elementalDamage: 75.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 3rdSpellCost: 12.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 4thSpellCost: 7.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: jumpHeight: 5.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: Resonance: {"Main":{"elementalSpellDamage":45.0,"4thSpellCost":27.5,"manaRegen":27.5},"Support":{"elementalSpellDamage":40.0,"4thSpellCost":22.5,"manaRegen":22.5,"healthRegen":12.5,"airDefence":2.5}}
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: elementalSpellDamage: 45.0
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: 4thSpellCost: 27.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: manaRegen: 27.5
+
+[02:01:38] [Render thread/INFO] (Minecraft) [STDOUT]: test
+[02:01:39] [Render thread/INFO] (Minecraft) Backend library: LWJGL version 3.3.3-snapshot
+[02:01:40] [Render thread/INFO] (Minecraft) Reloading ResourceManager: vanilla, fabric, fabric-api, fabric-api-base, fabric-api-lookup-api-v1, fabric-biome-api-v1, fabric-block-api-v1, fabric-block-view-api-v2, fabric-blockrenderlayer-v1, fabric-client-gametest-api-v1, fabric-client-tags-api-v1, fabric-command-api-v1, fabric-command-api-v2, fabric-commands-v0, fabric-content-registries-v0, fabric-convention-tags-v1, fabric-convention-tags-v2, fabric-crash-report-info-v1, fabric-data-attachment-api-v1, fabric-data-generation-api-v1, fabric-dimensions-v1, fabric-entity-events-v1, fabric-events-interaction-v0, fabric-game-rule-api-v1, fabric-gametest-api-v1, fabric-item-api-v1, fabric-item-group-api-v1, fabric-key-binding-api-v1, fabric-keybindings-v0, fabric-lifecycle-events-v1, fabric-loot-api-v2, fabric-loot-api-v3, fabric-message-api-v1, fabric-model-loading-api-v1, fabric-networking-api-v1, fabric-object-builder-api-v1, fabric-particles-v1, fabric-recipe-api-v1, fabric-registry-sync-v0, fabric-renderer-api-v1, fabric-renderer-indigo, fabric-rendering-data-attachment-v1, fabric-rendering-fluids-v1, fabric-rendering-v1, fabric-resource-conditions-api-v1, fabric-resource-loader-v0, fabric-screen-api-v1, fabric-screen-handler-api-v1, fabric-sound-api-v1, fabric-tag-api-v1, fabric-transfer-api-v1, fabric-transitive-access-wideners-v1, fabricloader, immolation
+[02:01:40] [Worker-Main-11/INFO] (Minecraft) Found unifont_all_no_pua-16.0.01.hex, loading
+[02:01:40] [Worker-Main-3/INFO] (Minecraft) Found unifont_jp_patch-16.0.01.hex, loading
+[02:01:41] [Render thread/INFO] (Minecraft) OpenAL initialized on device OpenAL Soft on Speakers (Realtek(R) Audio)
+[02:01:41] [Render thread/INFO] (Minecraft) Sound engine started
+[02:01:41] [Render thread/INFO] (Minecraft) Created: 1024x512x4 minecraft:textures/atlas/blocks.png-atlas
+[02:01:41] [Render thread/INFO] (Minecraft) Created: 256x256x4 minecraft:textures/atlas/signs.png-atlas
+[02:01:41] [Render thread/INFO] (Minecraft) Created: 512x512x4 minecraft:textures/atlas/banner_patterns.png-atlas
+[02:01:41] [Render thread/INFO] (Minecraft) Created: 512x512x4 minecraft:textures/atlas/shield_patterns.png-atlas
+[02:01:41] [Render thread/INFO] (Minecraft) Created: 2048x1024x4 minecraft:textures/atlas/armor_trims.png-atlas
+[02:01:41] [Render thread/INFO] (Minecraft) Created: 256x256x4 minecraft:textures/atlas/chest.png-atlas
+[02:01:41] [Render thread/INFO] (Minecraft) Created: 128x64x4 minecraft:textures/atlas/decorated_pot.png-atlas
+[02:01:41] [Render thread/INFO] (Minecraft) Created: 512x256x4 minecraft:textures/atlas/beds.png-atlas
+[02:01:41] [Render thread/INFO] (Minecraft) Created: 512x256x4 minecraft:textures/atlas/shulker_boxes.png-atlas
+[02:01:41] [Render thread/INFO] (Minecraft) Created: 64x64x0 minecraft:textures/atlas/map_decorations.png-atlas
+[02:01:42] [Render thread/INFO] (Minecraft) Created: 512x256x0 minecraft:textures/atlas/particles.png-atlas
+[02:01:42] [Render thread/INFO] (Minecraft) Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[02:01:42] [Render thread/INFO] (Minecraft) Created: 256x128x0 minecraft:textures/atlas/mob_effects.png-atlas
+[02:01:42] [Render thread/INFO] (Minecraft) Created: 1024x512x0 minecraft:textures/atlas/gui.png-atlas
+[02:01:46] [Render thread/INFO] (Minecraft) Loaded 1370 recipes
+[02:01:46] [Render thread/INFO] (Minecraft) Loaded 1481 advancements
+[02:01:46] [Render thread/INFO] (BiomeModificationImpl) Applied 0 biome modifications to 0 of 65 new biomes in 1.133 ms
+[02:01:46] [Server thread/INFO] (Minecraft) Starting integrated minecraft server version 1.21.4
+[02:01:46] [Server thread/INFO] (Minecraft) Generating keypair
+[02:01:46] [Server thread/INFO] (Minecraft) Preparing start region for dimension minecraft:overworld
+[02:01:47] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:01:47] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:01:47] [Render thread/INFO] (Minecraft) Time elapsed: 976 ms
+[02:01:47] [Server thread/INFO] (Minecraft) Changing view distance to 12, from 10
+[02:01:47] [Server thread/INFO] (Minecraft) Changing simulation distance to 12, from 0
+[02:01:48] [Server thread/INFO] (Minecraft) Player497[local:E:8490e953] logged in with entity id 89 at (-853.0528984809142, 72.0, -161.1353538224424)
+[02:01:48] [Server thread/INFO] (Minecraft) Player497 joined the game
+[02:01:49] [Render thread/INFO] (Minecraft) Loaded 2 advancements
+[02:01:49] [Render thread/INFO] (Minecraft) [STDOUT]: key 1 was pressed
+[02:01:49] [Render thread/INFO] (Minecraft) [System] [CHAT] Key 1 was pressed! 
+[02:01:50] [Server thread/INFO] (Minecraft) Saving and pausing game...
+[02:01:50] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld
+[02:01:50] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether
+[02:01:50] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end
+[02:02:03] [Server thread/INFO] (Minecraft) Saving and pausing game...
+[02:02:03] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld
+[02:02:03] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether
+[02:02:03] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end
