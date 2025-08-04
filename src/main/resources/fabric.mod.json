@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "immolation",
+  "version": "${version}",
+  "name": "immolation",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/immolation/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-datagen": [
+      "org.untitled.immolation.client.ImmolationDataGenerator"
+    ],
+    "client": [
+      "org.untitled.immolation.client.ImmolationClient"
+    ],
+    "main": [
+      "org.untitled.immolation.Immolation"
+    ]
+  },
+  "mixins": [
+    "immolation.mixins.json",
+    {
+      "config": "immolation.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
