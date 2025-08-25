@@ -14,14 +14,15 @@ import net.minecraft.util.Identifier;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL46;
 
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.untitled.immolation.client.gui.PersistentLines;
 public class Drawing extends Screen {
     //Could be sick to add a save/export feature for your drawings.
     //records are sick just auto make class without boilerplate
     private static record Pixel(int x, int y, int colour) {}
-    private static record PersistentLines(float x1,float y1, float x2, float y2, float width, int color) {}
+    //private static record PersistentLines(float x1,float y1, float x2, float y2, float width, int color) {}
     private List<Pixel> drawnPixels = new ArrayList<>();
     private List<PersistentLines> drawnLines = new ArrayList<>();
     private static PersistentLines previewLine = null;
@@ -58,6 +59,7 @@ public class Drawing extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        //legit have no clue im dumb need to clamp the preview line within the box
         previewLine = new PersistentLines((float)x,(float) y, (float)mouseX, (float)mouseY, 1, white);
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -65,20 +67,24 @@ public class Drawing extends Screen {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
 
-        if (button == 0) {
+
             isMouseDown = false;
-            if (clicked == 0) {
+            //this is just a blanket fix maybe fix codebase later lol THIS SUCKS WHY DID I WRITE THIS
+            int height = this.height / 2;
+            int width = this.width / 2;
+            int canvasX = (this.width - width) / 2;
+            int canvasY = (this.height - height) / 2;
 
+            if (isHovered(canvasX, canvasY, (int) mouseX, (int) mouseY)) {
                 addLine(new PersistentLines((float)x, (float)y, (float)mouseX, (float)mouseY, 1, white));
-                clicked = 1;
-            } else {
-
-                addLine(new PersistentLines((float)x, (float)y, (float)mouseX, (float)mouseY, 1, white));
-                clicked = 0;
             }
+//            if (mouseX > x && mouseX < x + this.width/2 && mouseY > y && mouseY < y + this.height/2 ) {
+//                addLine(new PersistentLines((float)x, (float)y, (float)mouseX, (float)mouseY, 1, white));
+//            }
 
 
-        }
+
+
         return super.mouseReleased(mouseX, mouseY, button);
     }
     public Drawing(Text title) {
@@ -140,12 +146,14 @@ public class Drawing extends Screen {
         int buttonY = canvasY + canvasHeight + 10;
 
         //the texture literally works itsjust buttontextures that doesnt ...
+
         int height = this.height / 2;
         int width = this.width / 2;
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
         int colour = 0x88000000;
         int white = 0xFFFFFFFF;
+        //drawSquare(context, x, y, x+width, y+height, colour);
         context.fill(x, y, x + width, y + height, colour);
 
         if (isHovered(x, y, mouseX, mouseY) && isMouseDown) {
@@ -160,17 +168,18 @@ public class Drawing extends Screen {
             //this is gonna get really messy really quick if i dont split it into multiple classes
             for (PersistentLines line : drawnLines) {
                 if (previewLine != null) {
+
                     drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, previewLine.width, previewLine.color);
                 }
 
-                drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width,line.color);
+                drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
             }
 
-        } else {
+        }
             for (Pixel p : drawnPixels) {
                 context.fill(p.x, p.y, p.x + pixelSize, p.y + pixelSize, white);
             }
-        }
+
 
         //draw background of pencil
         context.fill(buttonX-21, buttonY-1, buttonX+11, buttonY+31, colour );
@@ -222,8 +231,67 @@ public class Drawing extends Screen {
         GL46.glEnable(GL46.GL_CULL_FACE);
         GL46.glEnable(GL46.GL_DEPTH_TEST);
     }
+    /*public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, float width, int color) {
+        MatrixStack matrixStack = new MatrixStack();
+        matrixStack.push();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buf = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        //prob check if in bounding box here then clamp to edge
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        float len = (float) Math.sqrt(dx*dx + dy*dy);
+        if (len == 0 ) {
+            return;
+        }
+        dx = dx / len;
+        dy = dy / len;
+        float px = -dy * (width / 2.0f);
+        float py = dx * (width / 2.0f);
+
+        buf.vertex(x1 + px, y1 + py, color);
+        buf.vertex(x2 + px, y2 + py, color);
+        buf.vertex(x2 - px, y2 - py, color);
+        buf.vertex(x1 - px, y1 - py, color);
+        postRender(buf, matrixStack);
+        //logic behind it just modify to buf vertex
+//        glBegin(GL_QUADS);
+//        glVertex2f(x1 - px, y1 - py);
+//        glVertex2f(x1 + px, y1 + py);
+//        glVertex2f(x2 + px, y2 + py);
+//        glVertex2f(x2 - px, y2 - py);
+//        glEnd();
+        //buf.vertex()
+    }*/
+    //if i decide to use matrix stack for drawing the background square (runs into other issues tho...
+//    public static void drawSquare(DrawContext context, float x1, float y1, float x2, float y2, int color) {
+//        MatrixStack matrix = context.getMatrices();
+//        BufferBuilder buffer = getBufferBuilder(matrix, VertexFormat.DrawMode.QUADS);
+//        preRender();
+//
+//        Matrix4f pos = matrix.peek().getPositionMatrix();
+//        buffer.vertex(pos, x1, y1, 0).color(color);
+//        buffer.vertex(pos, x1, y2, 0).color(color);
+//        buffer.vertex(pos, x2, y2, 0).color(color);
+//        buffer.vertex(pos, x2, y1, 0).color(color);
+//        matrix.pop();
+//
+//        BufferRenderer.drawWithGlobalProgram(buffer.end());
+////        float a = ((color >> 24) & 0xFF) / 255.0f;
+////        float r = ((color >> 16) & 0xFF) / 255.0f;
+////        float g = ((color >> 8) & 0xFF) / 255.0f;
+////        float b = (color & 0xFF) / 255.0f;
+//        RenderSystem.setShaderColor(1,1,1,(float)0.5);
+//
+//        GL46.glDisable(GL46.GL_BLEND);
+//        GL46.glEnable(GL46.GL_CULL_FACE);
+//        GL46.glEnable(GL46.GL_DEPTH_TEST);
+//
+//    }
+
+
     //drawline function works TY  https://github.com/SyutoBestCoder/Byte-1.21/blob/b96b4f6ab8b3199886bed53b6bda554c11bb8698/src/main/java/com/syuto/bytes/utils/impl/render/RenderUtils.java#L217
     public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, float width, int color) {
+        //will have to check if its on canvas but i really cba rn
         MatrixStack matrix = context.getMatrices();
         BufferBuilder buffer = getBufferBuilder(matrix, VertexFormat.DrawMode.QUADS);
         preRender();
