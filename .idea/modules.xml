@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/immolation.iml" filepath="$PROJECT_DIR$/.idea/modules/immolation.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/immolation.client.iml" filepath="$PROJECT_DIR$/.idea/modules/immolation.client.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/immolation.main.iml" filepath="$PROJECT_DIR$/.idea/modules/immolation.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/immolation.test.iml" filepath="$PROJECT_DIR$/.idea/modules/immolation.test.iml" />

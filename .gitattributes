@@ -1,0 +1,6 @@
+build/* linguist-vendored
+.gradle/* linguist-vendored
+run/* linguist-vendored
+
+# You can also force Java for certain files
+*.java linguist-language=Java

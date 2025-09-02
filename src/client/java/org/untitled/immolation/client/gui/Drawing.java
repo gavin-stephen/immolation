@@ -28,6 +28,7 @@ public class Drawing extends Screen {
     private static PersistentLines previewLine = null;
     private boolean painting = false;
     private boolean onCanvas =  false;
+    private boolean lineToggle = false;
     private boolean lerp = false;
     private int pixelSize = 1;
     private static final Identifier eraser = Identifier.of("immolation", "greyeraser32x.png");
@@ -45,14 +46,21 @@ public class Drawing extends Screen {
     }
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0) {
+        int height = this.height / 2;
+        int width = this.width / 2;
+        int canvasX = (this.width - width) / 2;
+        int canvasY = (this.height - height) / 2;
+        if (button == 0 && isHovered(canvasX, canvasY, (int) mouseX, (int) mouseY)) {
             isMouseDown = true;
+            onCanvas = true;
             x = mouseX;
             y = mouseY;
 
             //could check for if mouse is inside box here but it would be way cleaner
             //to do just use a button or somehow get texturedbutton working ;(
             //might be worth to seperate eraser/pencil/line/shape tools into seperate classes (will get very bloated)
+        } else {
+            onCanvas = false;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -60,7 +68,17 @@ public class Drawing extends Screen {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         //legit have no clue im dumb need to clamp the preview line within the box
-        previewLine = new PersistentLines((float)x,(float) y, (float)mouseX, (float)mouseY, 1, white);
+
+        int height = this.height / 2;
+        int width = this.width / 2;
+        int canvasX = (this.width - width) / 2;
+        int canvasY = (this.height - height) / 2;
+        // Clamp mouse position inside the box
+        float clampedX = (float) Math.max(canvasX, Math.min(mouseX, canvasX + width));
+        float clampedY = (float) Math.max(canvasY, Math.min(mouseY, canvasY + height));
+
+        previewLine = new PersistentLines((float)x,(float) y, clampedX, clampedY, 1, white);
+        //previewLine = new PersistentLines((float)x,(float) y, (float)mouseX, (float)mouseY, 1, white);
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
@@ -74,14 +92,20 @@ public class Drawing extends Screen {
             int width = this.width / 2;
             int canvasX = (this.width - width) / 2;
             int canvasY = (this.height - height) / 2;
+            //temporary clamping of X/Y so even if you try drawing line outside it will just clamp to edge
+            float clampedX = (float) Math.max(canvasX, Math.min(mouseX, canvasX + width));
+            float clampedY = (float) Math.max(canvasY, Math.min(mouseY, canvasY + height));
 
-            if (isHovered(canvasX, canvasY, (int) mouseX, (int) mouseY)) {
-                addLine(new PersistentLines((float)x, (float)y, (float)mouseX, (float)mouseY, 1, white));
-            }
-//            if (mouseX > x && mouseX < x + this.width/2 && mouseY > y && mouseY < y + this.height/2 ) {
+//            if (isHovered(canvasX, canvasY, (int) mouseX, (int) mouseY) && lineToggle) {
+//
 //                addLine(new PersistentLines((float)x, (float)y, (float)mouseX, (float)mouseY, 1, white));
 //            }
 
+            //currently just checks if line toggle and if mouseClicked was on canvas
+            //mostly works and good enough for me for now
+            if (lineToggle && onCanvas) {
+                addLine(new PersistentLines((float)x, (float)y, clampedX, clampedY, 1, white));
+            }
 
 
 
@@ -92,10 +116,12 @@ public class Drawing extends Screen {
     }
     @Override
     protected void init() {
-        ButtonWidget buttonWidget = ButtonWidget.builder(Text.of("LERP : " + (lerp ? "Enabled" : "Disabled")), (button) -> {
+        //currently otggles whether drawing lines or pixels (probably add a seperate class to toggle between shapes
+        // lines and pixels
+        ButtonWidget buttonWidget = ButtonWidget.builder(Text.of("DOESNT MATTER : " + (lineToggle ? "Enabled" : "Disabled")), (button) -> {
             //THIS CODE IS RAN WHEN THE BUTTON IS PRESSED ( UPDATE THE CONFIG LATER AND OVERWRITE RENDERING OF LAVA
-            lerp = !lerp;
-            button.setMessage(Text.of("LERP : " + lerp));
+            lineToggle = !lineToggle;
+            button.setMessage(Text.of("DOESNT MATTER : " + lineToggle));
 
         }).dimensions(40,40,120,20).build();
         this.addDrawableChild(buttonWidget);
@@ -134,51 +160,51 @@ public class Drawing extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 //        context.drawTexture(RenderLayer::getGuiTextured, pencil,1,2,0,0,32,32,32,32);
         super.render(context, mouseX, mouseY, delta);
-        int canvasWidth = this.width / 2;
-        int canvasHeight = this.height / 2;
-        int canvasX = (this.width - canvasWidth) / 2;
-        int canvasY = (this.height - canvasHeight) / 2;
-        int texWidth = 32;
-        int texHeight = 32;
-
-        // Button position: centered horizontally on canvas, 10 pixels  below canvas bottom
-        int buttonX = canvasX + (canvasWidth - texWidth) / 2;
-        int buttonY = canvasY + canvasHeight + 10;
-
-        //the texture literally works itsjust buttontextures that doesnt ...
-
         int height = this.height / 2;
         int width = this.width / 2;
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
         int colour = 0x88000000;
         int white = 0xFFFFFFFF;
+        int canvasX = (this.width - width) / 2;
+        int canvasY = (this.height - height) / 2;
+        int texWidth = 32;
+        int texHeight = 32;
+
+        // Button position: centered horizontally on canvas, 10 pixels  below canvas bottom
+        int buttonX = canvasX + (width - texWidth) / 2;
+        int buttonY = canvasY + height + 10;
+
+        //the texture literally works itsjust buttontextures that doesnt ...
+
+
         //drawSquare(context, x, y, x+width, y+height, colour);
         context.fill(x, y, x + width, y + height, colour);
-
-        if (isHovered(x, y, mouseX, mouseY) && isMouseDown) {
+        // NOT line toggle for now = pixel drawing
+        if (isHovered(x, y, mouseX, mouseY) && isMouseDown && !lineToggle) {
             //allow drawing here
 
             addPixel(new Pixel(mouseX, mouseY, white));
 
 
         }
-        if (lerp) {
-            //drawLine(context, 0, 0, 55, 55, 2, white);
-            //this is gonna get really messy really quick if i dont split it into multiple classes
-            for (PersistentLines line : drawnLines) {
-                if (previewLine != null) {
 
-                    drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, previewLine.width, previewLine.color);
-                }
 
-                drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
+        //this is gonna get really messy really quick if i dont split it into multiple classes
+        //draw all lines to screen
+        for (PersistentLines line : drawnLines) {
+            if (previewLine != null) {
+
+                drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, previewLine.width, previewLine.color);
             }
 
+            drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
         }
-            for (Pixel p : drawnPixels) {
-                context.fill(p.x, p.y, p.x + pixelSize, p.y + pixelSize, white);
-            }
+
+        //draw all pixels to screen
+        for (Pixel p : drawnPixels) {
+            context.fill(p.x, p.y, p.x + pixelSize, p.y + pixelSize, white);
+        }
 
 
         //draw background of pencil
