@@ -12,12 +12,16 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.joml.Matrix4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL46;
 
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.untitled.immolation.client.gui.PersistentLines;
+
+
 public class Drawing extends Screen {
     //Could be sick to add a save/export feature for your drawings.
     //records are sick just auto make class without boilerplate
@@ -62,6 +66,14 @@ public class Drawing extends Screen {
         } else {
             onCanvas = false;
         }
+        //convert buffer to nativeimage then directly use getcolor() instead
+//        ByteBuffer buffer = BufferUtils.createByteBuffer(4);
+//        GL46.glReadPixels((int)mouseX, (int)mouseY, 1, 1, GL46.GL_RGBA, GL46.GL_UNSIGNED_BYTE, buffer);
+//        float r = buffer.get(0) & 0xFF;
+//        float g = buffer.get(1) & 0xFF;
+//        float b = buffer.get(2) & 0xFF;
+//        float a = buffer.get(3) & 0xFF;
+//        System.out.println("RGBA = " + r + " "  + g + " " + b + " " + a);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -179,6 +191,8 @@ public class Drawing extends Screen {
 
 
         //drawSquare(context, x, y, x+width, y+height, colour);
+
+        //drawing the square before the lines / pixels but it still causes drawline to be translucent
         context.fill(x, y, x + width, y + height, colour);
         // NOT line toggle for now = pixel drawing
         if (isHovered(x, y, mouseX, mouseY) && isMouseDown && !lineToggle) {
@@ -317,7 +331,7 @@ public class Drawing extends Screen {
 
     //drawline function works TY  https://github.com/SyutoBestCoder/Byte-1.21/blob/b96b4f6ab8b3199886bed53b6bda554c11bb8698/src/main/java/com/syuto/bytes/utils/impl/render/RenderUtils.java#L217
     public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, float width, int color) {
-        //will have to check if its on canvas but i really cba rn
+        //
         MatrixStack matrix = context.getMatrices();
         BufferBuilder buffer = getBufferBuilder(matrix, VertexFormat.DrawMode.QUADS);
         preRender();
@@ -325,7 +339,7 @@ public class Drawing extends Screen {
         Matrix4f pos = matrix.peek().getPositionMatrix();
         float dx = x2 - x1;
         float dy = y2 - y1;
-
+        //create a perpendicular vector to draw the line using gl quads
         float len = (float) Math.sqrt(dx * dx + dy * dy);
         if (len == 0) return;
 

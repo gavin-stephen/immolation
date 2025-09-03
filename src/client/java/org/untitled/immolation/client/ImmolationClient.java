@@ -11,8 +11,8 @@ public class ImmolationClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         KeyBindManager.register(); //register and wait for key binds
-
-        ItemWeight.loadWeights();
+        //waste of computation for now do later
+        //ItemWeight.loadWeights();
         System.out.println("test");
     }
 }
