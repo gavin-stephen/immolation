@@ -37,7 +37,7 @@ public class Drawing extends Screen {
     private double y;
     private int clicked = 0;
     private boolean isMouseDown = false;
-    private int white = 0xFFFFFFFF;
+    private final int white = 0xFFFFFFFF;
     private void addPixel(Pixel pixel) {
         drawnPixels.add(pixel);
     }
@@ -77,7 +77,13 @@ public class Drawing extends Screen {
         float clampedX = (float) Math.max(canvasX, Math.min(mouseX, canvasX + width));
         float clampedY = (float) Math.max(canvasY, Math.min(mouseY, canvasY + height));
 
-        previewLine = new PersistentLines((float)x,(float) y, clampedX, clampedY, 1, white);
+        //felt clunky having this in an if(isHovered()) will have to think on this later
+        if (lineToggle) {
+            previewLine = new PersistentLines((float)x,(float) y, clampedX, clampedY, 1, white);
+        }
+
+
+
         //previewLine = new PersistentLines((float)x,(float) y, (float)mouseX, (float)mouseY, 1, white);
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -166,6 +172,7 @@ public class Drawing extends Screen {
         int y = (this.height - height) / 2;
         int colour = 0x88000000;
         int white = 0xFFFFFFFF;
+
         int canvasX = (this.width - width) / 2;
         int canvasY = (this.height - height) / 2;
         int texWidth = 32;
@@ -175,11 +182,10 @@ public class Drawing extends Screen {
         int buttonX = canvasX + (width - texWidth) / 2;
         int buttonY = canvasY + height + 10;
 
-        //the texture literally works itsjust buttontextures that doesnt ...
 
-
-        //drawSquare(context, x, y, x+width, y+height, colour);
-        context.fill(x, y, x + width, y + height, colour);
+        // colour is just grey here
+        drawSquare(context, x, y, x+width, y+height, colour);
+        //context.fill(x, y, x + width, y + height, colour);
         // NOT line toggle for now = pixel drawing
         if (isHovered(x, y, mouseX, mouseY) && isMouseDown && !lineToggle) {
             //allow drawing here
@@ -206,12 +212,16 @@ public class Drawing extends Screen {
             context.fill(p.x, p.y, p.x + pixelSize, p.y + pixelSize, white);
         }
 
-
         //draw background of pencil
-        context.fill(buttonX-21, buttonY-1, buttonX+11, buttonY+31, colour );
+        drawSquare(context, buttonX-21, buttonY-1, buttonX+11, buttonY+31, colour);
+        //context.fill(buttonX-21, buttonY-1, buttonX+11, buttonY+31, colour );
         //draw backgronud of eraser
-        context.fill(buttonX+21, buttonY-1, buttonX+53, buttonY+31, colour );
+        //DRAWCONTEXT MESSES UP THE RENDERING ORDER IDK MAN I HATE THIS
+        drawSquare(context, buttonX+21, buttonY-1, buttonX+53, buttonY+31, colour );
+        //context.fill(buttonX+21, buttonY-1, buttonX+53, buttonY+31, colour );
         //draw both pencil and eraser
+        //THIS IS SO UNBELIEVABLY UGLY BUT I REALLY CBA REFACTOR LATER
+        RenderSystem.setShaderColor(1,1,1,1);
         context.drawTexture(RenderLayer::getGuiTextured, pencil,buttonX-20, buttonY, 0,0, texWidth, texHeight,texWidth, texHeight);
         context.drawTexture(RenderLayer::getGuiTextured, eraser,buttonX+20, buttonY, 0,0, texWidth, texHeight,texWidth, texHeight);
     }
@@ -241,6 +251,10 @@ public class Drawing extends Screen {
         return tessellator.begin(drawMode, VertexFormats.POSITION_COLOR);
     }
     public static void preRender() {
+
+        RenderSystem.setShaderColor(1f,1f,1f,1f);
+        RenderSystem.enableBlend();
+        //RenderSystem.defaultBlendFunc();
         GL46.glEnable(GL46.GL_BLEND);
         GL46.glBlendFunc(GL46.GL_SRC_ALPHA, GL46.GL_ONE_MINUS_SRC_ALPHA);
         GL46.glDisable(GL46.GL_CULL_FACE);
@@ -252,7 +266,7 @@ public class Drawing extends Screen {
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
         RenderSystem.setShaderColor(1,1,1,1);
-
+        RenderSystem.disableBlend();
         GL46.glDisable(GL46.GL_BLEND);
         GL46.glEnable(GL46.GL_CULL_FACE);
         GL46.glEnable(GL46.GL_DEPTH_TEST);
@@ -289,30 +303,30 @@ public class Drawing extends Screen {
         //buf.vertex()
     }*/
     //if i decide to use matrix stack for drawing the background square (runs into other issues tho...
-//    public static void drawSquare(DrawContext context, float x1, float y1, float x2, float y2, int color) {
-//        MatrixStack matrix = context.getMatrices();
-//        BufferBuilder buffer = getBufferBuilder(matrix, VertexFormat.DrawMode.QUADS);
-//        preRender();
-//
-//        Matrix4f pos = matrix.peek().getPositionMatrix();
-//        buffer.vertex(pos, x1, y1, 0).color(color);
-//        buffer.vertex(pos, x1, y2, 0).color(color);
-//        buffer.vertex(pos, x2, y2, 0).color(color);
-//        buffer.vertex(pos, x2, y1, 0).color(color);
-//        matrix.pop();
-//
-//        BufferRenderer.drawWithGlobalProgram(buffer.end());
-////        float a = ((color >> 24) & 0xFF) / 255.0f;
-////        float r = ((color >> 16) & 0xFF) / 255.0f;
-////        float g = ((color >> 8) & 0xFF) / 255.0f;
-////        float b = (color & 0xFF) / 255.0f;
-//        RenderSystem.setShaderColor(1,1,1,(float)0.5);
-//
-//        GL46.glDisable(GL46.GL_BLEND);
-//        GL46.glEnable(GL46.GL_CULL_FACE);
-//        GL46.glEnable(GL46.GL_DEPTH_TEST);
-//
-//    }
+    public static void drawSquare(DrawContext context, float x1, float y1, float x2, float y2, int color) {
+        MatrixStack matrix = context.getMatrices();
+        BufferBuilder buffer = getBufferBuilder(matrix, VertexFormat.DrawMode.QUADS);
+        preRender();
+
+        Matrix4f pos = matrix.peek().getPositionMatrix();
+        buffer.vertex(pos, x1, y1, 0).color(color);
+        buffer.vertex(pos, x1, y2, 0).color(color);
+        buffer.vertex(pos, x2, y2, 0).color(color);
+        buffer.vertex(pos, x2, y1, 0).color(color);
+        matrix.pop();
+
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+//        float a = ((color >> 24) & 0xFF) / 255.0f;
+//        float r = ((color >> 16) & 0xFF) / 255.0f;
+//        float g = ((color >> 8) & 0xFF) / 255.0f;
+//        float b = (color & 0xFF) / 255.0f;
+        RenderSystem.setShaderColor(1,1,1,(float)0.5);
+
+        GL46.glDisable(GL46.GL_BLEND);
+        GL46.glEnable(GL46.GL_CULL_FACE);
+        GL46.glEnable(GL46.GL_DEPTH_TEST);
+
+    }
 
 
     //drawline function works TY  https://github.com/SyutoBestCoder/Byte-1.21/blob/b96b4f6ab8b3199886bed53b6bda554c11bb8698/src/main/java/com/syuto/bytes/utils/impl/render/RenderUtils.java#L217
@@ -335,11 +349,11 @@ public class Drawing extends Screen {
         float px = -dy * width / 2;
         float py = dx * width / 2;
 
+
         buffer.vertex(pos, x1 + px, y1 + py, 0).color(color);
         buffer.vertex(pos, x2 + px, y2 + py, 0).color(color);
         buffer.vertex(pos, x2 - px, y2 - py, 0).color(color);
         buffer.vertex(pos, x1 - px, y1 - py, 0).color(color);
-
         postRender(buffer, matrix);
     }
     //add a function to deal with swapping tools (pencil / eraser) + maybe add fill bucket :)
