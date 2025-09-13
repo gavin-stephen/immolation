@@ -232,17 +232,7 @@ public class Drawing extends Screen {
             return false;
         }
     }
-//    public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, float width, int color) {
-//        Tessellator tessellator = Tessellator.getInstance();
-//        MatrixStack matrixStack = context.getMatrices();
-//        Matrix4f transformationMatrix = context.getMatrices().peek().getPositionMatrix();
-//
-//        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-//        buf.vertex(transformationMatrix, x1, y1, 5).color(0xFFFFFFFF);
-//        buf.vertex(transformationMatrix, x2, y2, 5).color(0xFFFFFFFF);
-//
-//        BufferRenderer.drawWithGlobalProgram(buf.end());
-//    }
+
     public static BufferBuilder getBufferBuilder(MatrixStack matrixStack, VertexFormat.DrawMode drawMode) {
         matrixStack.push();
 
