@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.untitled.immolation.client.gui.PersistentLines;
 public class Drawing extends Screen {
-    private static record Pixel(int x, int y, int colour) {}
+    private static record Pixel(int x, int y, int colour, int size) {}
 
     private final List<Pixel> drawnPixels = new ArrayList<>();
     private final List<PersistentLines> drawnLines = new ArrayList<>();
@@ -38,7 +39,8 @@ public class Drawing extends Screen {
     private static final Identifier ERASER = Identifier.of("immolation", "greyeraser32x.png");
     private static final Identifier PENCIL = Identifier.of("immolation", "pencil32x.png");
 
-
+    int MIN_BRUSH = 1;
+    int MAX_BRUSH = 20;
     //generic Tool object to store current tool
     private Tool currentTool = Tool.PAINTBRUSH;
     private enum Tool {
@@ -109,7 +111,7 @@ public class Drawing extends Screen {
 
 
     private void eraseAt(double mouseX, double mouseY) {
-        int eraseRadius = 2;
+        int eraseRadius = pixelSize;
         drawnPixels.removeIf(p -> distance(p.x, p.y, mouseX, mouseY) < eraseRadius);
         List<PersistentLines> newLines = new ArrayList<>();
 
@@ -186,7 +188,7 @@ public class Drawing extends Screen {
             if (currentTool == Tool.LINE) {
                 float clampedX = clampCanvasX(mouseX);
                 float clampedY = clampCanvasY(mouseY);
-                previewLine = new PersistentLines((float) x, (float) y, clampedX, clampedY, 1, white);
+                previewLine = new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, white);
             }
             if (currentTool == Tool.ERASER) {
                 eraseAt(mouseX, mouseY);
@@ -207,7 +209,7 @@ public class Drawing extends Screen {
         if (isInCanvas(mouseX,mouseY) && currentTool == Tool.LINE && onCanvas) {
             float clampedX = clampCanvasX(mouseX);
             float clampedY = clampCanvasY(mouseY);
-            drawnLines.add(new PersistentLines((float) x, (float) y, clampedX, clampedY, 1, white));
+            drawnLines.add(new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, white));
         }
 
         return super.mouseReleased(mouseX, mouseY, button);
@@ -220,6 +222,24 @@ public class Drawing extends Screen {
     @Override
     protected void init() {
         previewLine = null;
+
+        //This dynamically changes the size of each pixel,
+        //TODO: ENSURE bigger brush sizes do not go out of bounds (add clipping)
+        SliderWidget brushSizeSlider = new SliderWidget(0,0,200,20,
+                Text.literal("Brush Size: "),
+                (pixelSize - MIN_BRUSH) / (double)(MAX_BRUSH - MIN_BRUSH)
+                ) {
+            protected void applyValue() {
+                // Map slider value (0–1) to brush size
+                pixelSize = MIN_BRUSH + (int)(value * (MAX_BRUSH - MIN_BRUSH));
+            }
+
+            @Override
+            protected void updateMessage() {
+                setMessage(Text.literal("Brush Size: " + pixelSize));
+            }
+        };
+        addDrawableChild(brushSizeSlider);
         ButtonWidget toggleButton = ButtonWidget.builder(Text.of("DOESNT MATTER : " + (currentTool == Tool.LINE ? "Enabled" : "Disabled")), (button) -> {
             //just toggles between line and brush, will remove once have functioning tool buttons
             /*if (currentTool == Tool.LINE) {
@@ -257,10 +277,10 @@ public class Drawing extends Screen {
         if (isInCanvas(mouseX, mouseY) && isMouseDown) {
             //just temp they have same usage rn
             if (currentTool == Tool.PAINTBRUSH) {
-                drawnPixels.add(new Pixel(mouseX, mouseY, white));
+                drawnPixels.add(new Pixel(mouseX, mouseY, white, pixelSize));
             }
             if (currentTool == Tool.PENCIL) {
-                drawnPixels.add(new Pixel(mouseX, mouseY, white));
+                drawnPixels.add(new Pixel(mouseX, mouseY, white, pixelSize));
             }
 
         }
@@ -277,7 +297,8 @@ public class Drawing extends Screen {
 
         // Draw pixels
         for (Pixel p : drawnPixels) {
-            context.fill(p.x, p.y, p.x + pixelSize, p.y + pixelSize, white);
+            //buggy af
+            context.fill(p.x, p.y, p.x + p.size, p.y + p.size, white);
         }
 
         renderToolIcons(context);
