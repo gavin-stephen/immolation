@@ -184,6 +184,12 @@ public class Drawing extends Screen {
     }
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if(isInCanvas(mouseX+pixelSize, mouseY+pixelSize) && isMouseDown) {
+            if (currentTool == Tool.PAINTBRUSH){
+                //add color changing later
+                drawnPixels.add(new Pixel((int)mouseX,(int) mouseY, white, pixelSize));
+            }
+        }
         if (isInCanvas(mouseX, mouseY) && isMouseDown) {
             if (currentTool == Tool.LINE) {
                 float clampedX = clampCanvasX(mouseX);
@@ -274,35 +280,69 @@ public class Drawing extends Screen {
         drawSquare(context, x, y, x + w, y + h, color);
 
         // Draw pixels if painting
-        if (isInCanvas(mouseX, mouseY) && isMouseDown) {
+        if (isMouseDown) {
             //just temp they have same usage rn
             if (currentTool == Tool.PAINTBRUSH) {
-                drawnPixels.add(new Pixel(mouseX, mouseY, white, pixelSize));
+
+                    drawnPixels.add(new Pixel(mouseX, mouseY, white, pixelSize));
+
             }
             if (currentTool == Tool.PENCIL) {
-                drawnPixels.add(new Pixel(mouseX, mouseY, white, pixelSize));
+                //legit just checking bounds rn
+                int brushLeft   = (int) Math.max(canvasX(), mouseX);
+                int brushTop    = (int) Math.max(canvasY(), mouseY);
+                int brushRight  = (int) Math.min(canvasX() + canvasWidth(),  mouseX + pixelSize);
+                int brushBottom = (int) Math.min(canvasY() + canvasHeight(), mouseY + pixelSize);
+
+                if (brushRight > brushLeft && brushBottom > brushTop) {
+                    drawnPixels.add(new Pixel(mouseX, mouseY, white, pixelSize));
+                }
             }
 
         }
 
         // Draw persistent lines
         for (PersistentLines line : drawnLines) {
-            drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
+            drawLineClamped(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
         }
 
         // Draw preview line (if any)
         if (previewLine != null) {
-            drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, previewLine.width, previewLine.color);
+            drawLineClamped(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, previewLine.width, previewLine.color);
         }
-
+        float minX = canvasX();
+        float minY = canvasY();
+        float maxX = minX + canvasWidth();
+        float maxY = minY + canvasHeight();
         // Draw pixels
         for (Pixel p : drawnPixels) {
             //buggy af
-            context.fill(p.x, p.y, p.x + p.size, p.y + p.size, white);
+            //if (p.x < canvasX()|| p.y < canvasY() || p.x + p.size > canvasX()+canvasWidth() || p.y + p.size > canvasY()+canvasHeight()) continue;
+            //context.fill(p.x, p.y, p.x + p.size, p.y + p.size, white);
+
+
+            //new method
+            float x1 = p.x;
+            float y1 = p.y;
+            float x2 = p.x + p.size;
+            float y2 = p.y + p.size;
+
+            // Skip if completely outside
+            if (x2 < minX || x1 > maxX || y2 < minY || y1 > maxY)
+                continue;
+
+            // Clamp to visible area
+            float drawX1 = Math.max(x1, minX);
+            float drawY1 = Math.max(y1, minY);
+            float drawX2 = Math.min(x2, maxX);
+            float drawY2 = Math.min(y2, maxY);
+
+            context.fill((int)drawX1, (int)drawY1, (int)drawX2, (int)drawY2, p.colour);
         }
 
         renderToolIcons(context);
     }
+
 
     private void renderToolIcons(DrawContext context) {
         int texWidth = 32;
@@ -370,7 +410,29 @@ public class Drawing extends Screen {
 
         postRender(buffer, matrix);
     }
+    public void drawLineClamped(
+            DrawContext context, float x1, float y1, float x2, float y2,
+            float width, int color
+            ) {
+        float minX = canvasX();
+        float minY = canvasY();
+        float maxX = minX + canvasWidth();
+        float maxY = minY + canvasHeight();
+        // Cohen–Sutherland style trivial rejection
+        if ((x1 < minX && x2 < minX) || (x1 > maxX && x2 > maxX) ||
+                (y1 < minY && y2 < minY) || (y1 > maxY && y2 > maxY)) {
+            return; // Entirely outside canvas
+        }
 
+        // Clamp endpoints inside canvas bounds
+        x1 = Math.max(minX, Math.min(x1, maxX));
+        y1 = Math.max(minY, Math.min(y1, maxY));
+        x2 = Math.max(minX, Math.min(x2, maxX));
+        y2 = Math.max(minY, Math.min(y2, maxY));
+
+        // Then draw the clamped line
+        drawLine(context, x1, y1, x2, y2, width, color);
+    }
     public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, float width, int color) {
         MatrixStack matrix = context.getMatrices();
         BufferBuilder buffer = getBufferBuilder(matrix, VertexFormat.DrawMode.QUADS);
