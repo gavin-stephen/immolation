@@ -247,16 +247,10 @@ public class Drawing extends Screen {
         };
         addDrawableChild(brushSizeSlider);
         ButtonWidget toggleButton = ButtonWidget.builder(Text.of("DOESNT MATTER : " + (currentTool == Tool.LINE ? "Enabled" : "Disabled")), (button) -> {
-            //just toggles between line and brush, will remove once have functioning tool buttons
-            /*if (currentTool == Tool.LINE) {
-                currentTool = Tool.PAINTBRUSH;
 
-            } else {
-                currentTool = Tool.LINE;
-            }*/
-
+            //goes to next tool when click on button (change later)
             currentTool = nextTool(currentTool);
-            //lineToggle = !lineToggle;
+
             button.setMessage(Text.of("Tool : " + (currentTool)));
         }).dimensions(40, 40, 120, 20).build();
         addDrawableChild(toggleButton);
@@ -282,33 +276,41 @@ public class Drawing extends Screen {
         // Draw pixels if painting
         if (isMouseDown) {
             //just temp they have same usage rn
-            if (currentTool == Tool.PAINTBRUSH) {
+            int brushLeft   = (int) Math.max(canvasX(), mouseX);
+            int brushTop    = (int) Math.max(canvasY(), mouseY);
+            int brushRight  = (int) Math.min(canvasX() + canvasWidth(),  mouseX + pixelSize);
+            int brushBottom = (int) Math.min(canvasY() + canvasHeight(), mouseY + pixelSize);
+            //just rough bounds around
+            if (brushRight > brushLeft && brushBottom > brushTop) {
+                if (currentTool == Tool.PAINTBRUSH) {
 
                     drawnPixels.add(new Pixel(mouseX, mouseY, white, pixelSize));
 
-            }
-            if (currentTool == Tool.PENCIL) {
-                //legit just checking bounds rn
-                int brushLeft   = (int) Math.max(canvasX(), mouseX);
-                int brushTop    = (int) Math.max(canvasY(), mouseY);
-                int brushRight  = (int) Math.min(canvasX() + canvasWidth(),  mouseX + pixelSize);
-                int brushBottom = (int) Math.min(canvasY() + canvasHeight(), mouseY + pixelSize);
+                }
+                if (currentTool == Tool.PENCIL) {
 
-                if (brushRight > brushLeft && brushBottom > brushTop) {
                     drawnPixels.add(new Pixel(mouseX, mouseY, white, pixelSize));
+
                 }
             }
+
 
         }
 
         // Draw persistent lines
         for (PersistentLines line : drawnLines) {
-            drawLineClamped(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
+            //for clipping outside the bounding box
+            //use sutherland-hodgman https://www.geeksforgeeks.org/dsa/polygon-clipping-sutherland-hodgman-algorithm/
+
+            //check bounding box if entire line is outside, do not draw line
+            //if part of line is inside part is outside apply the sutherland-hodgman algo
+            //else draw line normally
+            drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
         }
 
         // Draw preview line (if any)
         if (previewLine != null) {
-            drawLineClamped(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, previewLine.width, previewLine.color);
+            drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, previewLine.width, previewLine.color);
         }
         float minX = canvasX();
         float minY = canvasY();
@@ -316,9 +318,6 @@ public class Drawing extends Screen {
         float maxY = minY + canvasHeight();
         // Draw pixels
         for (Pixel p : drawnPixels) {
-            //buggy af
-            //if (p.x < canvasX()|| p.y < canvasY() || p.x + p.size > canvasX()+canvasWidth() || p.y + p.size > canvasY()+canvasHeight()) continue;
-            //context.fill(p.x, p.y, p.x + p.size, p.y + p.size, white);
 
 
             //new method
@@ -410,6 +409,10 @@ public class Drawing extends Screen {
 
         postRender(buffer, matrix);
     }
+
+
+    //TODO: change clamp line drawing to be done at rendering, this will allow the user to draw as they please
+    /*
     public void drawLineClamped(
             DrawContext context, float x1, float y1, float x2, float y2,
             float width, int color
@@ -432,7 +435,7 @@ public class Drawing extends Screen {
 
         // Then draw the clamped line
         drawLine(context, x1, y1, x2, y2, width, color);
-    }
+    }*/
     public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, float width, int color) {
         MatrixStack matrix = context.getMatrices();
         BufferBuilder buffer = getBufferBuilder(matrix, VertexFormat.DrawMode.QUADS);
@@ -456,4 +459,88 @@ public class Drawing extends Screen {
 
         postRender(buffer, matrix);
     }
+
+
+    //Sutherland-Hodgman Polygon clipping algorithm from
+    //https://www.geeksforgeeks.org/dsa/polygon-clipping-sutherland-hodgman-algorithm/
+    static int x_intersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
+        int num = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4);
+        int den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        return num / den;
+    }
+
+    // Returns y-value of point of intersection of two lines
+    static int y_intersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
+        int num = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4);
+        int den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        return num / den;
+    }
+
+    // This functions clips all the edges w.r.t one clip edge of clipping area
+    static void clip(ArrayList<int[]> poly_points, int x1, int y1, int x2, int y2) {
+        ArrayList<int[]> new_points = new ArrayList<>();
+
+        for (int i = 0; i < poly_points.size(); i++) {
+            // i and k form a line in polygon
+            int k = (i + 1) % poly_points.size();
+            int ix = poly_points.get(i)[0], iy = poly_points.get(i)[1];
+            int kx = poly_points.get(k)[0], ky = poly_points.get(k)[1];
+
+            // Calculating position of first point w.r.t. clipper line
+            int i_pos = (x2 - x1) * (iy - y1) - (y2 - y1) * (ix - x1);
+
+            // Calculating position of second point w.r.t. clipper line
+            int k_pos = (x2 - x1) * (ky - y1) - (y2 - y1) * (kx - x1);
+
+            // Case 1 : When both points are inside
+            if (i_pos < 0 && k_pos < 0) {
+                //Only second point is added
+                new_points.add(new int[]{kx, ky});
+            }
+
+            // Case 2: When only first point is outside
+            else if (i_pos >= 0 && k_pos < 0) {
+                // Point of intersection with edge and the second point is added
+                new_points.add(new int[]{x_intersect(x1, y1, x2, y2, ix, iy, kx, ky), y_intersect(x1, y1, x2, y2, ix, iy, kx, ky)});
+                new_points.add(new int[]{kx, ky});
+            }
+
+            // Case 3: When only second point is outside
+            else if (i_pos < 0 && k_pos >= 0) {
+                //Only point of intersection with edge is added
+                new_points.add(new int[]{x_intersect(x1, y1, x2, y2, ix, iy, kx, ky), y_intersect(x1, y1, x2, y2, ix, iy, kx, ky)});
+            }
+
+            // Case 4: When both points are outside
+            else {
+                //No points are added
+            }
+        }
+
+        // Copying new points into original array and changing the no. of vertices
+        poly_points.clear();
+        poly_points.addAll(new_points);
+    }
+
+    // TODO:Implement Sutherland–Hodgman algorithm
+    //BOUNDING BOX MUST BE IN CLOCKWISE ORDER (e.g
+    // v1 -> v2
+    // ↑     ↓
+    // v0    v3
+    static void suthHodgClip(ArrayList<int[]> poly_points, ArrayList<int[]> bounding_box) {
+        //i and k are two consecutive indexes
+        //bounding_box is the box that we are clipping the polygon(poly_points) to
+        for (int i = 0; i < bounding_box.size(); i++) {
+            int k = (i + 1) % bounding_box.size();
+
+            // We pass the current array of vertices, it's size and the end points of the selected clipper line
+            clip(poly_points, bounding_box.get(i)[0], bounding_box.get(i)[1], bounding_box.get(k)[0], bounding_box.get(k)[1]);
+        }
+
+        // Printing vertices of clipped polygon
+        for (int[] point : poly_points)
+            System.out.println("(" + point[0] + ", " + point[1] + ")");
+    }
+
+
 }
