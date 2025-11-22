@@ -57,7 +57,7 @@ public class Drawing extends Screen {
     }
 
     //code is so unbelievably disgusting
-    public static int alpha;
+    public static int alpha = 0;
 
 
 
@@ -198,7 +198,12 @@ public class Drawing extends Screen {
         if(isInCanvas(mouseX+pixelSize, mouseY+pixelSize) && isMouseDown) {
             if (currentTool == Tool.PAINTBRUSH){
                 //add color changing later
-                drawnPixels.add(new Pixel((int)mouseX,(int) mouseY, white, pixelSize));
+                int rgb = java.awt.Color.HSBtoRGB(ColorPicker.hue,1f,1f);
+                int argb = ((int)(ColorPicker.alpha*255) << 24) | (rgb & 0x00FFFFFF);
+
+                drawnPixels.add(new Pixel((int)mouseX, (int)mouseY, argb, pixelSize));
+
+                //drawnPixels.add(new Pixel((int)mouseX,(int) mouseY, white, pixelSize));
             }
         }
         if (isInCanvas(mouseX, mouseY) && isMouseDown) {
@@ -208,6 +213,7 @@ public class Drawing extends Screen {
                 previewLine = new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, white);
             }
             if (currentTool == Tool.ERASER) {
+                //TODO: ERASING WITH SMALLER SIZE THAN DRAWN PIXELS IS INSANELY SCUFFED
                 eraseAt(mouseX, mouseY);
             }
         }
@@ -238,12 +244,13 @@ public class Drawing extends Screen {
 
     @Override
     protected void init() {
+        System.out.println("INIT RAN");
         previewLine = null;
 
         //This dynamically changes the size of each pixel,
         //TODO: ENSURE bigger brush sizes do not go out of bounds (add clipping)
         SliderWidget brushSizeSlider = new SliderWidget(0,0,200,20,
-                Text.literal("Brush Size: "),
+                Text.literal("Brush Size: " + pixelSize),
                 (pixelSize - MIN_BRUSH) / (double)(MAX_BRUSH - MIN_BRUSH)
                 ) {
             protected void applyValue() {
@@ -253,11 +260,13 @@ public class Drawing extends Screen {
 
             @Override
             protected void updateMessage() {
+
                 setMessage(Text.literal("Brush Size: " + pixelSize));
             }
         };
         addDrawableChild(brushSizeSlider);
-        ButtonWidget toggleButton = ButtonWidget.builder(Text.of("DOESNT MATTER : " + (currentTool == Tool.LINE ? "Enabled" : "Disabled")), (button) -> {
+
+        ButtonWidget toggleButton = ButtonWidget.builder(Text.of("Tool : " + (currentTool)), (button) -> {
 
             //goes to next tool when click on button (change later)
             currentTool = nextTool(currentTool);
@@ -265,6 +274,14 @@ public class Drawing extends Screen {
             button.setMessage(Text.of("Tool : " + (currentTool)));
         }).dimensions(40, 40, 120, 20).build();
         addDrawableChild(toggleButton);
+
+
+        //this is really disgusting with perma typecasting, probably make it more clean later
+        AlphaSlider alphaSlider = new AlphaSlider(width-100,20,100,20, Text.literal("Alpha: " + (int)(ColorPicker.alpha*255)), ColorPicker.alpha);
+        addDrawableChild(alphaSlider);
+
+        HueSlider hueSlider = new HueSlider(width-100, 40, 100, 20, Text.literal("Hue: " + ColorPicker.hue), ColorPicker.hue);
+        addDrawableChild(hueSlider);
     }
 
     // ===============================
@@ -294,8 +311,11 @@ public class Drawing extends Screen {
             //just rough bounds around
             if (brushRight > brushLeft && brushBottom > brushTop) {
                 if (currentTool == Tool.PAINTBRUSH) {
+                    //just temp paintbrush paints with colour, pencil does not
+                    int rgb = java.awt.Color.HSBtoRGB(ColorPicker.hue,1f,1f);
+                    int argb = ((int)(ColorPicker.alpha*255) << 24) | (rgb & 0x00FFFFFF);
 
-                    drawnPixels.add(new Pixel(mouseX, mouseY, white, pixelSize));
+                    drawnPixels.add(new Pixel(mouseX, mouseY, argb, pixelSize));
 
                 }
                 if (currentTool == Tool.PENCIL) {
@@ -350,9 +370,11 @@ public class Drawing extends Screen {
 
             context.fill((int)drawX1, (int)drawY1, (int)drawX2, (int)drawY2, p.colour);
         }
-        //render color picker here
+
+        //render all tool icons here
         renderToolIcons(context);
 
+        //(probably)render color picker here
     }
 
 

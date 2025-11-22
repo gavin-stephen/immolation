@@ -50,8 +50,22 @@ public class RenderUtils {
 
         postRender(buffer, matrix);
     }
+    //x1 y1  is top left corner -> x2 y2 botom right
+    public static void drawHollowBox(DrawContext context, int x1, int y1, int x2, int y2, int color, int thickness) {
+        int left = Math.min(x1, x2);
+        int top = Math.min(y1, y2);
+        int right = Math.max(x1, x2);
+        int bottom = Math.max(y1, y2);
 
-
+        // Top
+        context.fill(left, top, right, top + thickness, color);
+        // Bottom
+        context.fill(left, bottom - thickness, right, bottom, color);
+        // Left
+        context.fill(left, top, left + thickness, bottom, color);
+        // Right
+        context.fill(right - thickness, top, right, bottom, color);
+    }
     //TODO: change clamp line drawing to be done at rendering, this will allow the user to draw as they please
     /*
     public void drawLineClamped(
