@@ -25,7 +25,12 @@ public class ColorPicker extends ClickableWidget {
 
         System.out.println("ok");
     }
-
+    public Color getColor() {
+        return new Color(hue, saturation, brightness, alpha);
+    }
+    public static int getIntColor() {
+        return java.awt.Color.HSBtoRGB(hue, saturation, brightness);
+    }
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
 
@@ -69,6 +74,7 @@ public class ColorPicker extends ClickableWidget {
         System.out.println("updateValues to : Saturation " + saturation + " Brightness " + brightness);
         System.out.println("x/width : " +  x/getWidth());
         System.out.println("y/width : " +  y/getHeight());
+        //position to be used as indicator of what saturation/brightness is selected
         lastPosX = Math.clamp((int) (x - getX()), 0, getWidth());
         lastPosY = Math.clamp((int) (y - getY()), 0, getHeight());
         System.out.println("lastPosX : " + lastPosX);
