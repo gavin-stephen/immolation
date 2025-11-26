@@ -213,7 +213,7 @@ public class Drawing extends Screen {
                 previewLine = new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, white);
             }
             if (currentTool == Tool.ERASER) {
-                //TODO: ERASING WITH SMALLER SIZE THAN DRAWN PIXELS IS INSANELY SCUFFED
+                //TODO: ERASING WITH SMALLER SIZE THAN DRAWN PIXELS IS INSANELY SCUFFED (JUST WORKS ON TOP LEFT CORNER)
                 eraseAt(mouseX, mouseY);
             }
         }
@@ -227,7 +227,11 @@ public class Drawing extends Screen {
         if (this.client != null && !isInCanvas(mouseX, mouseY))  {
             //instantly rerender the current frame if the mouse gets released outside of bounds
             //(to remove the inaccurate previewLine)
-            this.client.setScreen(this);
+            //TODO: commented this on 11/26/25, should add back if unable to fix (doesnt look like it does anything anyway)
+            //this.client.setScreen(this);
+
+
+            previewLine = null; //remove previewline it shouldnt matter tho bc it has explicit checking in draw
         }
         if (isInCanvas(mouseX,mouseY) && currentTool == Tool.LINE && onCanvas) {
             float clampedX = clampCanvasX(mouseX);
@@ -280,8 +284,11 @@ public class Drawing extends Screen {
         AlphaSlider alphaSlider = new AlphaSlider(width-100,20,100,20, Text.literal("Alpha: " + (int)(ColorPicker.alpha*255)), ColorPicker.alpha);
         addDrawableChild(alphaSlider);
 
-        HueSlider hueSlider = new HueSlider(width-100, 40, 100, 20, Text.literal("Hue: " + ColorPicker.hue), ColorPicker.hue);
+        HueSlider hueSlider = new HueSlider(width-100, 80, 100, 20, Text.literal("Hue: " + ColorPicker.hue), ColorPicker.hue);
         addDrawableChild(hueSlider);
+
+        ColorPicker colorPicker = new ColorPicker(width-100, 40, 100, 40, Text.literal("test"));
+        addDrawableChild(colorPicker);
     }
 
     // ===============================
@@ -312,15 +319,15 @@ public class Drawing extends Screen {
             if (brushRight > brushLeft && brushBottom > brushTop) {
                 if (currentTool == Tool.PAINTBRUSH) {
                     //just temp paintbrush paints with colour, pencil does not
-                    int rgb = java.awt.Color.HSBtoRGB(ColorPicker.hue,1f,1f);
+                    int rgb = java.awt.Color.HSBtoRGB(ColorPicker.hue,ColorPicker.saturation,ColorPicker.brightness);
                     int argb = ((int)(ColorPicker.alpha*255) << 24) | (rgb & 0x00FFFFFF);
 
                     drawnPixels.add(new Pixel(mouseX, mouseY, argb, pixelSize));
 
                 }
                 if (currentTool == Tool.PENCIL) {
-
-                    drawnPixels.add(new Pixel(mouseX, mouseY, white, pixelSize));
+                    //pencil tool uses size of 1 no matter what
+                    drawnPixels.add(new Pixel(mouseX, mouseY, white, 1));
 
                 }
 

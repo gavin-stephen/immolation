@@ -145,7 +145,32 @@ public class RenderUtils {
     } // for now call with RenderUtils.fillGradient(context,500,500,900,900, Integer.parseInt("FFFF00", 16), Integer.parseInt("800080", 16));
     //TODO: set up CustomColor usage within Drawing tomorrow
 
+    public static void fillSidewaysGradient(DrawContext context, float x1, float y1, float x2, float y2, int color1, int color2) {
+        MatrixStack matrix = context.getMatrices();
+        BufferBuilder buffer = getBufferBuilder(matrix, VertexFormat.DrawMode.QUADS);
+        //preRender();
+        //testing with manual pre here
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableDepthTest();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
+
+
+        Matrix4f pos = matrix.peek().getPositionMatrix();
+        //add the 4 vertexes
+        buffer.vertex(x1,y1,0).color(color1);
+        buffer.vertex(x1,y2,0).color(color1);
+        buffer.vertex(x2,y2,0).color(color2);
+        buffer.vertex(x2,y1,0).color(color2);
+
+
+        //postRender(buffer, matrix);
+        //testing with manual here
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableBlend();
+    }
 
 
 

@@ -24,7 +24,7 @@ public class HueSlider extends SliderWidget {
     }
     @Override
     public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        System.out.println("renderWidgetHueSlider");
+        //System.out.println("renderWidgetHueSlider");
         int x = getX();
         int y = getY();
         int width = getWidth();
