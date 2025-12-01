@@ -259,8 +259,13 @@ public class Drawing extends Screen {
 
     @Override
     protected void init() {
-        System.out.println("INIT RAN");
+        //clear boxes
+        drawnBoxes.clear();
+        previewBox = null;
+        //clear line
         previewLine = null;
+        System.out.println("INIT RAN");
+
 
         //This dynamically changes the size of each pixel,
         //TODO: ENSURE bigger brush sizes do not go out of bounds (add clipping)
