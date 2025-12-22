@@ -130,7 +130,9 @@ public class Drawing extends Screen {
         for (PersistentLines line : drawnLines) {
             newLines.addAll(trimLineWithCircle(line, mouseX, mouseY, eraseRadius));
         }
-
+//        for (PersistentLines box : drawnBoxes) {
+//              maybe use this probably just have all in drawnlines
+//        }
         drawnLines.clear();
         drawnLines.addAll(newLines);
     }
@@ -211,7 +213,7 @@ public class Drawing extends Screen {
             if (currentTool == Tool.LINE) {
                 float clampedX = clampCanvasX(mouseX);
                 float clampedY = clampCanvasY(mouseY);
-                previewLine = new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, white);
+                previewLine = new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor());
             }
             if (currentTool == Tool.ERASER) {
                 //TODO: ERASING WITH SMALLER SIZE THAN DRAWN PIXELS IS INSANELY SCUFFED (JUST WORKS ON TOP LEFT CORNER)
@@ -238,16 +240,28 @@ public class Drawing extends Screen {
 
 
             previewLine = null; //remove previewline it shouldnt matter tho bc it has explicit checking in draw
+            previewBox = null;
         }
         if (isInCanvas(mouseX,mouseY) && currentTool == Tool.LINE && onCanvas) {
             float clampedX = clampCanvasX(mouseX);
             float clampedY = clampCanvasY(mouseY);
-            drawnLines.add(new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, white));
+            drawnLines.add(new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor()));
         }
         if (isInCanvas(mouseX,mouseY) && currentTool == Tool.SQUARE && onCanvas) {
-            float clampedX = clampCanvasX(mouseX);
-            float clampedY = clampCanvasY(mouseY);
-            drawnBoxes.add(new PersistentLines((float) x, (float) y, clampedX, clampedY,  pixelSize, ColorPicker.getIntColor()));
+//            float clampedX = clampCanvasX(mouseX);
+//            float clampedY = clampCanvasY(mouseY);
+//            drawnBoxes.add(new PersistentLines((float) x, (float) y, clampedX, clampedY,  pixelSize, ColorPicker.getIntColor()));
+
+            float left = Math.min(previewBox.x1, previewBox.x2);
+            float top = Math.min(previewBox.y1, previewBox.y2);
+            float right = Math.max(previewBox.x1, previewBox.x2);
+            float bottom = Math.max(previewBox.y1, previewBox.y2);
+            //TODO: FIX lines being aligned when drawn
+            drawnLines.add(new PersistentLines(left, top, right, top, pixelSize, ColorPicker.getIntColor()));
+            drawnLines.add(new PersistentLines(left, bottom, right, bottom, pixelSize, ColorPicker.getIntColor()));
+            drawnLines.add(new PersistentLines(left, top, left, bottom, pixelSize, ColorPicker.getIntColor()));
+            drawnLines.add(new PersistentLines(right, top, right, bottom, pixelSize, ColorPicker.getIntColor()));
+
         }
 
         return super.mouseReleased(mouseX, mouseY, button);
@@ -363,17 +377,28 @@ public class Drawing extends Screen {
             drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
         }
         //loop through all boxes and draw them
-        for (PersistentLines box : drawnBoxes ) {
-
-            RenderUtils.drawHollowBox(context, (int) box.x1, (int) box.y1, (int) box.x2, (int) box.y2, box.color, (int)box.width);
-        }
+        //TODO: probably add boxes as a seperate data type holding 4x lines (that i then loop through)
+//        for (PersistentLines box : drawnBoxes ) {
+//
+//            RenderUtils.drawHollowBox(context, (int) box.x1, (int) box.y1, (int) box.x2, (int) box.y2, box.color, (int)box.width);
+//        }
         // Draw preview line (if any)
         if (previewLine != null) {
             drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, previewLine.width, previewLine.color);
         }
         //draw square if square tool
         if (previewBox != null) {
-            RenderUtils.drawHollowBox(context, (int) previewBox.x1, (int) previewBox.y1,(int) previewBox.x2,(int) previewBox.y2, previewBox.color,(int) previewBox.width);
+
+            float left = Math.min(previewBox.x1, previewBox.x2);
+            float top = Math.min(previewBox.y1, previewBox.y2);
+            float right = Math.max(previewBox.x1, previewBox.x2);
+            float bottom = Math.max(previewBox.y1, previewBox.y2);
+
+            drawLine(context, left, top, right, top, previewBox.width, previewBox.color);
+            drawLine(context, left, bottom, right, bottom, previewBox.width, previewBox.color);
+            drawLine(context, left, top, left, bottom, previewBox.width, previewBox.color);
+            drawLine(context, right, top, right, bottom, previewBox.width, previewBox.color);
+
         }
         float minX = canvasX();
         float minY = canvasY();

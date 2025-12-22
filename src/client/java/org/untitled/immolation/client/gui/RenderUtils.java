@@ -66,6 +66,7 @@ public class RenderUtils {
         // Right
         context.fill(right - thickness, top, right, bottom, color);
     }
+
     //TODO: change clamp line drawing to be done at rendering, this will allow the user to draw as they please
     /*
     public void drawLineClamped(
