@@ -224,6 +224,13 @@ public class Drawing extends Screen {
                 float clampedY = clampCanvasY(mouseY);
                 previewBox = new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor());
             }
+            if (currentTool == Tool.PENCIL) {
+                //PENCIL ALWAYS SIZE = 1
+                //and smoother drawing than paintbrush (splotchy)
+                drawInterpolated(x,y,mouseX,mouseY, ColorPicker.getIntColor(), 1);
+                x = mouseX;
+                y = mouseY;
+            }
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -357,7 +364,8 @@ public class Drawing extends Screen {
                 }
                 if (currentTool == Tool.PENCIL) {
                     //pencil tool uses size of 1 no matter what
-                    drawnPixels.add(new Pixel(mouseX, mouseY, white, 1));
+                    //prob useless
+                    //drawnPixels.add(new Pixel(mouseX, mouseY, white, 1));
 
                 }
 
@@ -464,5 +472,30 @@ public class Drawing extends Screen {
     // Rendering Helpers (unchanged)
     // ===============================
 
+    /**
+     * Interpolates extra drawn pixels between 2 points (smoother drawing)
+     * @param x0
+     * @param y0
+     * @param x1
+     * @param y1
+     * @param color
+     * @param size
+     */
+    private void drawInterpolated(double x0, double y0, double x1, double y1, int color, int size) {
+        double dx = x1 - x0;
+        double dy = y1 - y0;
+        double dist = Math.hypot(dx, dy); // sqrt(dx^2 + dy^2)
 
+        // spacing controls smoothness
+        double step = Math.max(1.0, size * 0.5);
+
+        int steps = (int) (dist / step);
+
+        for (int i = 0; i <= steps; i++) {
+            double t = (double) i / steps;
+            int x = (int) (x0 + dx * t);
+            int y = (int) (y0 + dy * t);
+            drawnPixels.add(new Pixel(x, y, color, size));
+        }
+    }
 }
