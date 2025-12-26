@@ -132,6 +132,11 @@ public class Drawing extends Screen {
         for (PersistentLines line : drawnLines) {
             newLines.addAll(trimLineWithCircle(line, mouseX, mouseY, eraseRadius));
         }
+
+        for (List<Pixel> lp : drawnCircles) {
+
+            lp.removeIf(p -> distance(p.x, p.y, mouseX, mouseY) < eraseRadius);
+        }
 //        for (PersistentLines box : drawnBoxes) {
 //              maybe use this probably just have all in drawnlines
 //        }
