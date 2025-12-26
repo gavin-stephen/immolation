@@ -161,7 +161,7 @@ public class RenderUtils {
 
 
 
-        Matrix4f pos = matrix.peek().getPositionMatrix();
+        //Matrix4f pos = matrix.peek().getPositionMatrix();
         //add the 4 vertexes
         buffer.vertex(x1,y1,0).color(color1);
         buffer.vertex(x1,y2,0).color(color1);

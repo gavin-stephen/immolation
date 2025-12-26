@@ -27,10 +27,12 @@ public class Drawing extends Screen {
     private static record Pixel(int x, int y, int colour, int size) {}
 
     private final List<Pixel> drawnPixels = new ArrayList<>();
+    private final List<List<Pixel>> drawnCircles = new ArrayList<>(); // List<Pixel> is each circle
     private final List<PersistentLines> drawnLines = new ArrayList<>();
-    private final List<PersistentLines> drawnBoxes = new ArrayList<>(); // this is getting really messy
+    private final List<PersistentLines> drawnBoxes = new ArrayList<>(); // this is getting really messy might be worth swapping to a Box + Circle class (especially if moving to more shapes)
     private static PersistentLines previewLine = null;
     private static PersistentLines previewBox = null; // to be used in Square tool
+    private static List<Pixel> previewCircle = null;
     private boolean painting = false;
     private boolean onCanvas = false;
     //private boolean lineToggle = false;
@@ -231,6 +233,9 @@ public class Drawing extends Screen {
                 x = mouseX;
                 y = mouseY;
             }
+            if (currentTool == Tool.CIRCLE) {
+                previewCircle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
+            }
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -248,6 +253,7 @@ public class Drawing extends Screen {
 
             previewLine = null; //remove previewline it shouldnt matter tho bc it has explicit checking in draw
             previewBox = null;
+            previewCircle = null;
         }
         if (isInCanvas(mouseX,mouseY) && currentTool == Tool.LINE && onCanvas) {
             float clampedX = clampCanvasX(mouseX);
@@ -270,7 +276,12 @@ public class Drawing extends Screen {
             drawnLines.add(new PersistentLines(right, top, right, bottom, pixelSize, ColorPicker.getIntColor()));
 
         }
+        if (isInCanvas(mouseX, mouseY) && currentTool == Tool.CIRCLE) {
+            //works jsut need to add preview and circle drawing logic
 
+            List<Pixel> circle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
+            drawnCircles.add(circle);
+        }
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
@@ -284,6 +295,7 @@ public class Drawing extends Screen {
         drawnBoxes.clear();
         previewBox = null;
         //clear line
+        previewCircle = null;
         previewLine = null;
         System.out.println("INIT RAN");
 
@@ -408,6 +420,14 @@ public class Drawing extends Screen {
             drawLine(context, right, top, right, bottom, previewBox.width, previewBox.color);
 
         }
+        if (previewCircle != null) {
+            //kinda scuffed preview circle shifting around if you move mouse backwards but it works
+            for (Pixel p : previewCircle) {
+
+                context.fill(p.x, p.y, p.x+p.size, p.y+p.size, p.colour);
+
+            }
+        }
         float minX = canvasX();
         float minY = canvasY();
         float maxX = minX + canvasWidth();
@@ -434,7 +454,26 @@ public class Drawing extends Screen {
 
             context.fill((int)drawX1, (int)drawY1, (int)drawX2, (int)drawY2, p.colour);
         }
+        for (List<Pixel> lp : drawnCircles) {
+            for (Pixel p : lp) {
+                float x1 = p.x;
+                float y1 = p.y;
+                float x2 = p.x + p.size;
+                float y2 = p.y + p.size;
 
+                // Skip if completely outside
+                if (x2 < minX || x1 > maxX || y2 < minY || y1 > maxY)
+                    continue;
+
+                // Clamp to visible area
+                float drawX1 = Math.max(x1, minX);
+                float drawY1 = Math.max(y1, minY);
+                float drawX2 = Math.min(x2, maxX);
+                float drawY2 = Math.min(y2, maxY);
+
+                context.fill((int)drawX1, (int)drawY1, (int)drawX2, (int)drawY2, p.colour);
+            }
+        }
         //render all tool icons here
         renderToolIcons(context);
 
@@ -497,5 +536,48 @@ public class Drawing extends Screen {
             int y = (int) (y0 + dy * t);
             drawnPixels.add(new Pixel(x, y, color, size));
         }
+    }
+    private void plotPoints(int xc, int yc, int x, int y, List<Pixel> circle) {
+        circle.add(new Pixel(xc+x, yc+y, ColorPicker.getIntColor(), pixelSize));
+        circle.add(new Pixel(xc-x, yc+y, ColorPicker.getIntColor(), pixelSize));
+        circle.add(new Pixel(xc+x, yc-y, ColorPicker.getIntColor(), pixelSize));
+        circle.add(new Pixel(xc-x, yc-y, ColorPicker.getIntColor(), pixelSize));
+        circle.add(new Pixel(xc+y, yc+x, ColorPicker.getIntColor(), pixelSize));
+        circle.add(new Pixel(xc-y, yc+x, ColorPicker.getIntColor(), pixelSize));
+        circle.add(new Pixel(xc+y, yc-x, ColorPicker.getIntColor(), pixelSize));
+        circle.add(new Pixel(xc-y, yc-x, ColorPicker.getIntColor(), pixelSize));
+    }
+    private List<Pixel> drawCircle(double x0, double y0, double x1, double y1, int size, int color) {
+        List<Pixel> circle = new ArrayList<>();
+        double left   = Math.min(x0, x1);
+        double right  = Math.max(x0, x1);
+        double top    = Math.min(y0, y1);
+        double bottom = Math.max(y0, y1);
+
+        int  width  = (int) (right - left);
+        int height = (int) (bottom - top);
+
+        //what am i writing
+        int xc = ((int)x0+(int)x1)/2;
+        int yc = ((int)y0+(int)y1)/2;
+        int r =   Math.min(width, height)/2;
+        int curX = 0;
+        int curY = r;
+        int d= 3-2*r;
+        while (curY >= curX) {
+            if (d > 0) {
+                curY--;
+                d = d + 4 * (curX - curY) +10;
+            } else {
+                d = d + 4 * curX + 6;
+            }
+            curX++;
+            plotPoints(xc,  yc,  curX,  curY, circle);
+        }
+
+        //drawnCircles.add(circle);
+        return circle;
+
+
     }
 }

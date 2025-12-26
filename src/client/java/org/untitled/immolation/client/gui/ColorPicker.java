@@ -44,8 +44,10 @@ public class ColorPicker extends ClickableWidget {
 
         //System.out.println("renderwidfget colorpicker");
 
-        //makes the gradient black -> transparent vertical and white -> hue horizontal
-        RenderUtils.fillSidewaysGradient(context, x, y, x+width, y+height, 0xFFFFFFFF, java.awt.Color.HSBtoRGB(hue, 1f, 1f) );
+        //makes the gradient black -> transparent vertical and white -> hue
+        int black = 0xFFFFFFFF; //can add global dictionary of colors in customcolor
+
+        RenderUtils.fillSidewaysGradient(context, x, y, x+width, y+height, black, java.awt.Color.HSBtoRGB(hue, 1f, 1f) );
         RenderUtils.fillGradient(context, x, y, x+width, y+height, 0x00FFFFFF, 0xFF000000);
 
 

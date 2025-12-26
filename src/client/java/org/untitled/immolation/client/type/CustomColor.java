@@ -1,6 +1,10 @@
 package org.untitled.immolation.client.type;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class CustomColor {
+
     int r;
     int g;
     int b;
@@ -18,6 +22,27 @@ public class CustomColor {
         this.b = b;
         this.a = 255;
     }
+    //Common Colors used for easy use
+    public static final Map<String, CustomColor> CommonColors = Map.ofEntries(
+            Map.entry("darkred",     new CustomColor(170, 0, 0, 255)),
+            Map.entry("red",         new CustomColor(255, 85, 85, 255)),
+            Map.entry("gold",        new CustomColor(255, 170, 0, 255)),
+            Map.entry("yellow",      new CustomColor(255, 255, 85, 255)),
+            Map.entry("darkgreen",   new CustomColor(0, 170, 0, 255)),
+            Map.entry("green",       new CustomColor(85, 255, 85, 255)),
+            Map.entry("aqua",        new CustomColor(85, 255, 255, 255)),
+            Map.entry("darkaqua",    new CustomColor(0, 170, 170, 255)),
+            Map.entry("darkblue",    new CustomColor(0, 0, 170, 255)),
+            Map.entry("blue",        new CustomColor(85,  85,  255, 255)),
+            Map.entry("lightpurple", new CustomColor(255, 85,  255, 255)),
+            Map.entry("darkpurple",  new CustomColor(170, 0,   170, 255)),
+            Map.entry("white",       new CustomColor(255, 255, 255, 255)),
+            Map.entry("gray",        new CustomColor(170, 170, 170, 255)),
+            Map.entry("darkgray",    new CustomColor(85,  85,  85,  255)),
+            Map.entry("black",       new CustomColor(0,   0,   0,   255))
+
+
+    );
 
     /**
      *Method takes in a colour int in the format 0x(AA)RRGGBB
