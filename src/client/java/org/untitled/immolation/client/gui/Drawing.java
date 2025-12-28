@@ -29,7 +29,7 @@ public class Drawing extends Screen {
     private final List<Pixel> drawnPixels = new ArrayList<>();
     private final List<List<Pixel>> drawnCircles = new ArrayList<>(); // List<Pixel> is each circle
     private final List<PersistentLines> drawnLines = new ArrayList<>();
-    private final List<PersistentLines> drawnBoxes = new ArrayList<>(); // this is getting really messy might be worth swapping to a Box + Circle class (especially if moving to more shapes)
+    private final List<List<PersistentLines>> drawnBoxes = new ArrayList<>(); // this is getting really messy might be worth swapping to a Box + Circle class (especially if moving to more shapes)
     private static PersistentLines previewLine = null;
     private static PersistentLines previewBox = null; // to be used in Square tool
     private static List<Pixel> previewCircle = null;
@@ -132,7 +132,11 @@ public class Drawing extends Screen {
         for (PersistentLines line : drawnLines) {
             newLines.addAll(trimLineWithCircle(line, mouseX, mouseY, eraseRadius));
         }
-
+        for (List<PersistentLines> lines : drawnBoxes) {
+            for (PersistentLines line: lines) {
+                newLines.addAll(trimLineWithCircle(line, mouseX, mouseY, eraseRadius));
+            }
+        }
         for (List<Pixel> lp : drawnCircles) {
 
             lp.removeIf(p -> distance(p.x, p.y, mouseX, mouseY) < eraseRadius);
@@ -275,11 +279,13 @@ public class Drawing extends Screen {
             float right = Math.max(previewBox.x1, previewBox.x2);
             float bottom = Math.max(previewBox.y1, previewBox.y2);
             //TODO: FIX lines being aligned when drawn
-            drawnLines.add(new PersistentLines(left, top, right, top, pixelSize, ColorPicker.getIntColor()));
-            drawnLines.add(new PersistentLines(left, bottom, right, bottom, pixelSize, ColorPicker.getIntColor()));
-            drawnLines.add(new PersistentLines(left, top, left, bottom, pixelSize, ColorPicker.getIntColor()));
-            drawnLines.add(new PersistentLines(right, top, right, bottom, pixelSize, ColorPicker.getIntColor()));
+            List<PersistentLines> box = new ArrayList<>();
 
+            box.add(new PersistentLines(left, top, right, top, pixelSize, ColorPicker.getIntColor()));
+            box.add(new PersistentLines(left, bottom, right, bottom, pixelSize, ColorPicker.getIntColor()));
+            box.add(new PersistentLines(left, top, left, bottom, pixelSize, ColorPicker.getIntColor()));
+            box.add(new PersistentLines(right, top, right, bottom, pixelSize, ColorPicker.getIntColor()));
+            drawnBoxes.add(box);
         }
         if (isInCanvas(mouseX, mouseY) && currentTool == Tool.CIRCLE) {
             //works jsut need to add preview and circle drawing logic
@@ -401,12 +407,13 @@ public class Drawing extends Screen {
             //else draw line normally
             drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
         }
-        //loop through all boxes and draw them
-        //TODO: probably add boxes as a seperate data type holding 4x lines (that i then loop through)
-//        for (PersistentLines box : drawnBoxes ) {
-//
-//            RenderUtils.drawHollowBox(context, (int) box.x1, (int) box.y1, (int) box.x2, (int) box.y2, box.color, (int)box.width);
-//        }
+        //TODO: add a stack? that contains all elements and draws in that order.
+        for (List<PersistentLines> lines : drawnBoxes) {
+            for (PersistentLines line : lines) {
+                drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
+            }
+        }
+
         // Draw preview line (if any)
         if (previewLine != null) {
             drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, previewLine.width, previewLine.color);
