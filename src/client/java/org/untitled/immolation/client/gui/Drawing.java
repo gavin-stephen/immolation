@@ -1,35 +1,129 @@
 package org.untitled.immolation.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL46;
 
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
-import org.untitled.immolation.client.gui.PersistentLines;
 
 //render methods like drawSquare / drawLine / etc
 import static org.untitled.immolation.client.gui.RenderUtils.*;
 
 public class Drawing extends Screen {
+    interface DrawCommand {
+        void draw(DrawContext context);
+        List<DrawCommand> eraseAt(double x, double y, double radius);
+    }
+
+    class PixelCommand implements DrawCommand {
+        private final List<Pixel> pixels;
+
+        PixelCommand(List<Pixel> pixels) {
+            this.pixels = pixels;
+        }
+
+        @Override
+        public void draw(DrawContext context) {
+            for (Pixel p : pixels) {
+                context.fill(p.x, p.y, p.x + p.size, p.y + p.size, p.colour);
+            }
+        }
+
+        @Override
+        public List<DrawCommand> eraseAt(double x, double y, double r) {
+            pixels.removeIf(p -> Math.hypot(p.x - x, p.y - y) < r);
+            if (pixels.isEmpty()) {
+                return List.of(); // fully erased
+            } else {
+                return List.of(this); // still has pixels remaining
+            }
+        }
+    }
+    class BoxCommand implements DrawCommand {
+        List<LineCommand> edges;
+        public BoxCommand(List<PersistentLines> lines) {
+            edges = new ArrayList<>();
+            for (PersistentLines l : lines) {
+                assert edges != null;
+                edges.add(new LineCommand(l));
+            }
+        }
+        public void draw(DrawContext context) {
+            for (LineCommand edge : edges) {
+                edge.draw(context);
+            }
+        }
+
+        public List<DrawCommand> eraseAt(double x, double y, double r) {
+            List<LineCommand> remainingEdges = new ArrayList<>();
+
+            for (LineCommand edge : edges) {
+                List<DrawCommand> erasedSegments = edge.eraseAt(x, y, r);
+                for (DrawCommand cmd : erasedSegments) {
+                    remainingEdges.add((LineCommand) cmd);
+                }
+            }
+
+            if (remainingEdges.isEmpty()) return new ArrayList<>();
+
+            BoxCommand updatedBox = new BoxCommand(new ArrayList<>()); // empty constructor
+            updatedBox.edges = remainingEdges;
+            return List.of(updatedBox);
+        }
+    }
+    class LineCommand implements DrawCommand {
+        PersistentLines line;
+        public LineCommand(PersistentLines line) {
+            this.line = line;
+        }
+        @Override
+        public void draw(DrawContext context) {
+            drawLine(context, line.x1, line.y1, line.x2, line.y2, (int) line.width, line.color);
+        }
+
+        @Override
+        public List<DrawCommand> eraseAt(double x, double y, double r) {
+            List<PersistentLines> segments = trimLineWithCircle(line, x, y, r);
+            List<DrawCommand> out = new ArrayList<>();
+            for (PersistentLines seg : segments) {
+                out.add(new LineCommand(seg));
+            }
+            return out; // empty list if fully erased
+        }
+    }
+    class CircleCommand implements DrawCommand {
+        List<Pixel> pixels;
+        public CircleCommand (List<Pixel> circle) {
+            this.pixels = circle;
+        }
+        public void draw(DrawContext context) {
+            for (Pixel p : pixels) {
+                context.fill(p.x, p.y, p.x + p.size, p.y + p.size, p.colour);
+            }
+        }
+
+        @Override
+        public List<DrawCommand> eraseAt(double x, double y, double r) {
+            pixels.removeIf(p -> Math.hypot(p.x - x, p.y - y) <= r);
+            return pixels.isEmpty() ? new ArrayList<>() : List.of(this);
+        }
+    }
     private static record Pixel(int x, int y, int colour, int size) {}
 
-    private final List<Pixel> drawnPixels = new ArrayList<>();
-    private final List<List<Pixel>> drawnCircles = new ArrayList<>(); // List<Pixel> is each circle
-    private final List<PersistentLines> drawnLines = new ArrayList<>();
-    private final List<List<PersistentLines>> drawnBoxes = new ArrayList<>(); // this is getting really messy might be worth swapping to a Box + Circle class (especially if moving to more shapes)
+//    private final List<Pixel> drawnPixels = new ArrayList<>();
+//    private final List<List<Pixel>> drawnCircles = new ArrayList<>(); // List<Pixel> is each circle
+//    private final List<PersistentLines> drawnLines = new ArrayList<>();
+//    private final List<List<PersistentLines>> drawnBoxes = new ArrayList<>(); // this is getting really messy might be worth swapping to a Box + Circle class (especially if moving to more shapes)
+    private final List<DrawCommand> drawStack = new ArrayList<>();
+    //TODO: add a stack data structure with the ordering that elements are drawn in?
+    // will be super annoying to remove out of for erasing, ponder a better idea
+
     private static PersistentLines previewLine = null;
     private static PersistentLines previewBox = null; // to be used in Square tool
     private static List<Pixel> previewCircle = null;
@@ -124,33 +218,12 @@ public class Drawing extends Screen {
     }
 
 
-    private void eraseAt(double mouseX, double mouseY) {
-        int eraseRadius = pixelSize;
-        drawnPixels.removeIf(p -> distance(p.x, p.y, mouseX, mouseY) < eraseRadius);
-        List<PersistentLines> newLines = new ArrayList<>();
-
-        for (PersistentLines line : drawnLines) {
-            newLines.addAll(trimLineWithCircle(line, mouseX, mouseY, eraseRadius));
-        }
-        for (List<PersistentLines> lines : drawnBoxes) {
-            for (PersistentLines line: lines) {
-                newLines.addAll(trimLineWithCircle(line, mouseX, mouseY, eraseRadius));
-            }
-        }
-        for (List<Pixel> lp : drawnCircles) {
-
-            lp.removeIf(p -> distance(p.x, p.y, mouseX, mouseY) < eraseRadius);
-        }
-//        for (PersistentLines box : drawnBoxes) {
-//              maybe use this probably just have all in drawnlines
-//        }
-        drawnLines.clear();
-        drawnLines.addAll(newLines);
-    }
     // EraseAt+trimLine method from GPT
     private List<PersistentLines> trimLineWithCircle(PersistentLines line, double cx, double cy, double r) {
-        double x1 = line.x1, y1 = line.y1;
-        double x2 = line.x2, y2 = line.y2;
+        double x1 = line.x1;
+        double y1 = line.y1;
+        double x2 = line.x2;
+        double y2 = line.y2;
 
         double dx = x2 - x1;
         double dy = y2 - y1;
@@ -212,12 +285,22 @@ public class Drawing extends Screen {
         if(isInCanvas(mouseX+pixelSize, mouseY+pixelSize) && isMouseDown) {
             if (currentTool == Tool.PAINTBRUSH){
                 //add color changing later
-                int rgb = java.awt.Color.HSBtoRGB(ColorPicker.hue,1f,1f);
-                int argb = ((int)(ColorPicker.alpha*255) << 24) | (rgb & 0x00FFFFFF);
-
-                drawnPixels.add(new Pixel((int)mouseX, (int)mouseY, argb, pixelSize));
+//                int rgb = java.awt.Color.HSBtoRGB(ColorPicker.hue,1f,1f);
+//                int argb = ((int)(ColorPicker.alpha*255) << 24) | (rgb & 0x00FFFFFF);
+                List<Pixel> stroke = new ArrayList<>();
+                stroke.add(new Pixel((int)mouseX, (int)mouseY, ColorPicker.getIntColor(), pixelSize));
+                drawStack.add(new PixelCommand(stroke));
+                //drawnPixels.add(new Pixel((int)mouseX, (int)mouseY, argb, pixelSize));
 
                 //drawnPixels.add(new Pixel((int)mouseX,(int) mouseY, white, pixelSize));
+            }
+            if (currentTool == Tool.PENCIL) {
+                List<Pixel> stroke = new ArrayList<>();
+                drawInterpolated(x,y,mouseX,mouseY,ColorPicker.getIntColor(), 1, stroke);
+                x=mouseX;
+                y=mouseY;
+                drawStack.add(new PixelCommand(stroke));
+
             }
         }
         if (isInCanvas(mouseX, mouseY) && isMouseDown) {
@@ -228,20 +311,26 @@ public class Drawing extends Screen {
             }
             if (currentTool == Tool.ERASER) {
                 //TODO: ERASING WITH SMALLER SIZE THAN DRAWN PIXELS IS INSANELY SCUFFED (JUST WORKS ON TOP LEFT CORNER)
-                eraseAt(mouseX, mouseY);
+                List<DrawCommand> newStack = new ArrayList<>();
+                for (DrawCommand cmd : drawStack) {
+                    newStack.addAll(cmd.eraseAt(mouseX, mouseY, pixelSize));
+                }
+                drawStack.clear();
+                drawStack.addAll(newStack);
+                //eraseAt(mouseX, mouseY);
             }
             if (currentTool == Tool.SQUARE ) {
                 float clampedX = clampCanvasX(mouseX);
                 float clampedY = clampCanvasY(mouseY);
                 previewBox = new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor());
             }
-            if (currentTool == Tool.PENCIL) {
-                //PENCIL ALWAYS SIZE = 1
-                //and smoother drawing than paintbrush (splotchy)
-                drawInterpolated(x,y,mouseX,mouseY, ColorPicker.getIntColor(), 1);
-                x = mouseX;
-                y = mouseY;
-            }
+//            if (currentTool == Tool.PENCIL) {
+//                //PENCIL ALWAYS SIZE = 1
+//                //and smoother drawing than paintbrush (splotchy)
+//                drawInterpolated(x,y,mouseX,mouseY, ColorPicker.getIntColor(), 1, stroke);
+//                x = mouseX;
+//                y = mouseY;
+//            }
             if (currentTool == Tool.CIRCLE) {
                 previewCircle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
             }
@@ -267,7 +356,8 @@ public class Drawing extends Screen {
         if (isInCanvas(mouseX,mouseY) && currentTool == Tool.LINE && onCanvas) {
             float clampedX = clampCanvasX(mouseX);
             float clampedY = clampCanvasY(mouseY);
-            drawnLines.add(new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor()));
+            drawStack.add(new LineCommand(new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor())));
+
         }
         if (isInCanvas(mouseX,mouseY) && currentTool == Tool.SQUARE && onCanvas) {
 //            float clampedX = clampCanvasX(mouseX);
@@ -285,13 +375,13 @@ public class Drawing extends Screen {
             box.add(new PersistentLines(left, bottom, right, bottom, pixelSize, ColorPicker.getIntColor()));
             box.add(new PersistentLines(left, top, left, bottom, pixelSize, ColorPicker.getIntColor()));
             box.add(new PersistentLines(right, top, right, bottom, pixelSize, ColorPicker.getIntColor()));
-            drawnBoxes.add(box);
+            drawStack.add(new BoxCommand(box));
         }
         if (isInCanvas(mouseX, mouseY) && currentTool == Tool.CIRCLE) {
             //works jsut need to add preview and circle drawing logic
 
             List<Pixel> circle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
-            drawnCircles.add(circle);
+            drawStack.add(new CircleCommand(circle));
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
@@ -303,7 +393,7 @@ public class Drawing extends Screen {
     @Override
     protected void init() {
         //clear boxes
-        drawnBoxes.clear();
+        //drawnBoxes.clear();
         previewBox = null;
         //clear line
         previewCircle = null;
@@ -368,55 +458,14 @@ public class Drawing extends Screen {
         // Canvas background
         drawSquare(context, x, y, x + w, y + h, color);
 
-        // Draw pixels if painting
-        if (isMouseDown) {
-            //just temp they have same usage rn
-            int brushLeft   = (int) Math.max(canvasX(), mouseX);
-            int brushTop    = (int) Math.max(canvasY(), mouseY);
-            int brushRight  = (int) Math.min(canvasX() + canvasWidth(),  mouseX + pixelSize);
-            int brushBottom = (int) Math.min(canvasY() + canvasHeight(), mouseY + pixelSize);
-            //just rough bounds around
-            if (brushRight > brushLeft && brushBottom > brushTop) {
-                if (currentTool == Tool.PAINTBRUSH) {
-                    //just temp paintbrush paints with colour, pencil does not
-                    int rgb = java.awt.Color.HSBtoRGB(ColorPicker.hue,ColorPicker.saturation,ColorPicker.brightness);
-                    int argb = ((int)(ColorPicker.alpha*255) << 24) | (rgb & 0x00FFFFFF);
 
-                    drawnPixels.add(new Pixel(mouseX, mouseY, argb, pixelSize));
-
-                }
-                if (currentTool == Tool.PENCIL) {
-                    //pencil tool uses size of 1 no matter what
-                    //prob useless
-                    //drawnPixels.add(new Pixel(mouseX, mouseY, white, 1));
-
-                }
-
-            }
-
-
+        //draw the already drew elements first then previewline/box/circle
+        for (DrawCommand cmd: drawStack) {
+            cmd.draw(context);
         }
 
-        // Draw persistent lines
-        for (PersistentLines line : drawnLines) {
-            //for clipping outside the bounding box
-            //use sutherland-hodgman https://www.geeksforgeeks.org/dsa/polygon-clipping-sutherland-hodgman-algorithm/
-
-            //check bounding box if entire line is outside, do not draw line
-            //if part of line is inside part is outside apply the sutherland-hodgman algo
-            //else draw line normally
-            drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
-        }
-        //TODO: add a stack? that contains all elements and draws in that order.
-        for (List<PersistentLines> lines : drawnBoxes) {
-            for (PersistentLines line : lines) {
-                drawLine(context, line.x1, line.y1, line.x2, line.y2, line.width, line.color);
-            }
-        }
-
-        // Draw preview line (if any)
         if (previewLine != null) {
-            drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, previewLine.width, previewLine.color);
+            drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, (int) previewLine.width, previewLine.color);
         }
         //draw square if square tool
         if (previewBox != null) {
@@ -426,10 +475,10 @@ public class Drawing extends Screen {
             float right = Math.max(previewBox.x1, previewBox.x2);
             float bottom = Math.max(previewBox.y1, previewBox.y2);
 
-            drawLine(context, left, top, right, top, previewBox.width, previewBox.color);
-            drawLine(context, left, bottom, right, bottom, previewBox.width, previewBox.color);
-            drawLine(context, left, top, left, bottom, previewBox.width, previewBox.color);
-            drawLine(context, right, top, right, bottom, previewBox.width, previewBox.color);
+            drawLine(context, left, top, right, top, (int) previewBox.width, previewBox.color);
+            drawLine(context, left, bottom, right, bottom, (int) previewBox.width, previewBox.color);
+            drawLine(context, left, top, left, bottom, (int) previewBox.width, previewBox.color);
+            drawLine(context, right, top, right, bottom, (int) previewBox.width, previewBox.color);
 
         }
         if (previewCircle != null) {
@@ -440,52 +489,7 @@ public class Drawing extends Screen {
 
             }
         }
-        float minX = canvasX();
-        float minY = canvasY();
-        float maxX = minX + canvasWidth();
-        float maxY = minY + canvasHeight();
-        // Draw pixels
-        for (Pixel p : drawnPixels) {
 
-
-            //new method
-            float x1 = p.x;
-            float y1 = p.y;
-            float x2 = p.x + p.size;
-            float y2 = p.y + p.size;
-
-            // Skip if completely outside
-            if (x2 < minX || x1 > maxX || y2 < minY || y1 > maxY)
-                continue;
-
-            // Clamp to visible area
-            float drawX1 = Math.max(x1, minX);
-            float drawY1 = Math.max(y1, minY);
-            float drawX2 = Math.min(x2, maxX);
-            float drawY2 = Math.min(y2, maxY);
-
-            context.fill((int)drawX1, (int)drawY1, (int)drawX2, (int)drawY2, p.colour);
-        }
-        for (List<Pixel> lp : drawnCircles) {
-            for (Pixel p : lp) {
-                float x1 = p.x;
-                float y1 = p.y;
-                float x2 = p.x + p.size;
-                float y2 = p.y + p.size;
-
-                // Skip if completely outside
-                if (x2 < minX || x1 > maxX || y2 < minY || y1 > maxY)
-                    continue;
-
-                // Clamp to visible area
-                float drawX1 = Math.max(x1, minX);
-                float drawY1 = Math.max(y1, minY);
-                float drawX2 = Math.min(x2, maxX);
-                float drawY2 = Math.min(y2, maxY);
-
-                context.fill((int)drawX1, (int)drawY1, (int)drawX2, (int)drawY2, p.colour);
-            }
-        }
         //render all tool icons here
         renderToolIcons(context);
 
@@ -532,7 +536,7 @@ public class Drawing extends Screen {
      * @param color
      * @param size
      */
-    private void drawInterpolated(double x0, double y0, double x1, double y1, int color, int size) {
+    private void drawInterpolated(double x0, double y0, double x1, double y1, int color, int size, List<Pixel> lp) {
         double dx = x1 - x0;
         double dy = y1 - y0;
         double dist = Math.hypot(dx, dy); // sqrt(dx^2 + dy^2)
@@ -546,7 +550,7 @@ public class Drawing extends Screen {
             double t = (double) i / steps;
             int x = (int) (x0 + dx * t);
             int y = (int) (y0 + dy * t);
-            drawnPixels.add(new Pixel(x, y, color, size));
+            lp.add(new Pixel(x, y, color, size));
         }
     }
     private void plotPoints(int xc, int yc, int x, int y, List<Pixel> circle) {
@@ -591,5 +595,36 @@ public class Drawing extends Screen {
         return circle;
 
 
+    }
+    public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, int width, int color) {
+        int ix1 = Math.round(x1);
+        int iy1 = Math.round(y1);
+        int ix2 = Math.round(x2);
+        int iy2 = Math.round(y2);
+
+        int dx = Math.abs(ix2 - ix1);
+        int dy = Math.abs(iy2 - iy1);
+
+        int sx = ix1 < ix2 ? 1 : -1;
+        int sy = iy1 < iy2 ? 1 : -1;
+
+        int err = dx - dy;
+
+        while (true) {
+            // Draw a small square centered on the current point to simulate line width
+            int half = width / 2;
+            context.fill(ix1 - half, iy1 - half, ix1 + half + 1, iy1 + half + 1, color);
+
+            if (ix1 == ix2 && iy1 == iy2) break;
+            int e2 = 2 * err;
+            if (e2 > -dy) {
+                err -= dy;
+                ix1 += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                iy1 += sy;
+            }
+        }
     }
 }

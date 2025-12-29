@@ -95,7 +95,7 @@ public class RenderUtils {
 
 
     //Draw line always draws below paintbrush in drawcontext...
-    public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, float width, int color) {
+    /*public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, float width, int color) {
         MatrixStack matrix = context.getMatrices();
         BufferBuilder buffer = getBufferBuilder(matrix, VertexFormat.DrawMode.QUADS);
         preRender();
@@ -117,7 +117,7 @@ public class RenderUtils {
         buffer.vertex(pos, x1 - px, y1 - py, 0).color(color);
 
         postRender(buffer, matrix);
-    }
+    }*/
 
 
 
