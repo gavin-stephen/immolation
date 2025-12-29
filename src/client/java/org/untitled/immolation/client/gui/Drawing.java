@@ -16,11 +16,14 @@ import java.util.List;
 import static org.untitled.immolation.client.gui.RenderUtils.*;
 
 public class Drawing extends Screen {
+
+    // Each DrawCommand must have draw + erase functions
     interface DrawCommand {
         void draw(DrawContext context);
         List<DrawCommand> eraseAt(double x, double y, double radius);
     }
 
+    // Represents a collection of individual pixels (like a brush stroke)
     class PixelCommand implements DrawCommand {
         private final List<Pixel> pixels;
 
@@ -31,7 +34,7 @@ public class Drawing extends Screen {
         @Override
         public void draw(DrawContext context) {
             for (Pixel p : pixels) {
-                context.fill(p.x, p.y, p.x + p.size, p.y + p.size, p.colour);
+                context.fill(p.x, p.y, p.x + p.size, p.y + p.size, p.color);
             }
         }
 
@@ -45,6 +48,8 @@ public class Drawing extends Screen {
             }
         }
     }
+
+    // Represents a rectangular shape made of 4 edges (lines)
     class BoxCommand implements DrawCommand {
         List<LineCommand> edges;
         public BoxCommand(List<PersistentLines> lines) {
@@ -77,6 +82,7 @@ public class Drawing extends Screen {
             return List.of(updatedBox);
         }
     }
+    // Represents a single straight line (x0,y0 -> x1,y1)
     class LineCommand implements DrawCommand {
         PersistentLines line;
         public LineCommand(PersistentLines line) {
@@ -97,6 +103,7 @@ public class Drawing extends Screen {
             return out; // empty list if fully erased
         }
     }
+    // Represents the pixels that make up the circle
     class CircleCommand implements DrawCommand {
         List<Pixel> pixels;
         public CircleCommand (List<Pixel> circle) {
@@ -104,7 +111,7 @@ public class Drawing extends Screen {
         }
         public void draw(DrawContext context) {
             for (Pixel p : pixels) {
-                context.fill(p.x, p.y, p.x + p.size, p.y + p.size, p.colour);
+                context.fill(p.x, p.y, p.x + p.size, p.y + p.size, p.color);
             }
         }
 
@@ -114,28 +121,21 @@ public class Drawing extends Screen {
             return pixels.isEmpty() ? new ArrayList<>() : List.of(this);
         }
     }
-    private static record Pixel(int x, int y, int colour, int size) {}
+    //Basic Pixel object containing x y color and size
+    private static record Pixel(int x, int y, int color, int size) {}
 
-//    private final List<Pixel> drawnPixels = new ArrayList<>();
-//    private final List<List<Pixel>> drawnCircles = new ArrayList<>(); // List<Pixel> is each circle
-//    private final List<PersistentLines> drawnLines = new ArrayList<>();
-//    private final List<List<PersistentLines>> drawnBoxes = new ArrayList<>(); // this is getting really messy might be worth swapping to a Box + Circle class (especially if moving to more shapes)
+    //drawStack stores all drawing commands in order(e.g Draw a line, draw a box, draw a circle)
     private final List<DrawCommand> drawStack = new ArrayList<>();
-    //TODO: add a stack data structure with the ordering that elements are drawn in?
-    // will be super annoying to remove out of for erasing, ponder a better idea
 
     private static PersistentLines previewLine = null;
     private static PersistentLines previewBox = null; // to be used in Square tool
     private static List<Pixel> previewCircle = null;
-    private boolean painting = false;
+
     private boolean onCanvas = false;
-    //private boolean lineToggle = false;
-    private boolean lerp = false;
+
     private int pixelSize = 1;
     private boolean isMouseDown = false;
     private double x, y;
-
-    private final int white = 0xFFFFFFFF;
 
     private static final Identifier ERASER = Identifier.of("immolation", "greyeraser32x.png");
     private static final Identifier PENCIL = Identifier.of("immolation", "pencil32x.png");
@@ -152,12 +152,6 @@ public class Drawing extends Screen {
         SQUARE,
         LINE
     }
-
-    //code is so unbelievably disgusting
-    public static int alpha = 0;
-
-
-
 
     //creates a line out of canvas bounds when swapped to using button (prob just change rendering to check for it?)
     private Tool nextTool(Tool current) {
@@ -275,26 +269,18 @@ public class Drawing extends Screen {
 
         return result;
     }
-    private double distance(double x1, double y1, double x2, double y2) {
-        double dx = x1 - x2;
-        double dy = y1 - y2;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if(isInCanvas(mouseX+pixelSize, mouseY+pixelSize) && isMouseDown) {
             if (currentTool == Tool.PAINTBRUSH){
-                //add color changing later
-//                int rgb = java.awt.Color.HSBtoRGB(ColorPicker.hue,1f,1f);
-//                int argb = ((int)(ColorPicker.alpha*255) << 24) | (rgb & 0x00FFFFFF);
+
                 List<Pixel> stroke = new ArrayList<>();
                 stroke.add(new Pixel((int)mouseX, (int)mouseY, ColorPicker.getIntColor(), pixelSize));
                 drawStack.add(new PixelCommand(stroke));
-                //drawnPixels.add(new Pixel((int)mouseX, (int)mouseY, argb, pixelSize));
 
-                //drawnPixels.add(new Pixel((int)mouseX,(int) mouseY, white, pixelSize));
             }
             if (currentTool == Tool.PENCIL) {
+                //Pencil is ALWAYS 1 thick and smoother drawing
                 List<Pixel> stroke = new ArrayList<>();
                 drawInterpolated(x,y,mouseX,mouseY,ColorPicker.getIntColor(), 1, stroke);
                 x=mouseX;
@@ -324,13 +310,6 @@ public class Drawing extends Screen {
                 float clampedY = clampCanvasY(mouseY);
                 previewBox = new PersistentLines((float) x, (float) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor());
             }
-//            if (currentTool == Tool.PENCIL) {
-//                //PENCIL ALWAYS SIZE = 1
-//                //and smoother drawing than paintbrush (splotchy)
-//                drawInterpolated(x,y,mouseX,mouseY, ColorPicker.getIntColor(), 1, stroke);
-//                x = mouseX;
-//                y = mouseY;
-//            }
             if (currentTool == Tool.CIRCLE) {
                 previewCircle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
             }
@@ -343,11 +322,6 @@ public class Drawing extends Screen {
         isMouseDown = false;
         //mostly works
         if (this.client != null && !isInCanvas(mouseX, mouseY))  {
-            //instantly rerender the current frame if the mouse gets released outside of bounds
-            //(to remove the inaccurate previewLine)
-            //TODO: commented this on 11/26/25, should add back if unable to fix (doesnt look like it does anything anyway)
-            //this.client.setScreen(this);
-
 
             previewLine = null; //remove previewline it shouldnt matter tho bc it has explicit checking in draw
             previewBox = null;
@@ -360,15 +334,12 @@ public class Drawing extends Screen {
 
         }
         if (isInCanvas(mouseX,mouseY) && currentTool == Tool.SQUARE && onCanvas) {
-//            float clampedX = clampCanvasX(mouseX);
-//            float clampedY = clampCanvasY(mouseY);
-//            drawnBoxes.add(new PersistentLines((float) x, (float) y, clampedX, clampedY,  pixelSize, ColorPicker.getIntColor()));
 
             float left = Math.min(previewBox.x1, previewBox.x2);
             float top = Math.min(previewBox.y1, previewBox.y2);
             float right = Math.max(previewBox.x1, previewBox.x2);
             float bottom = Math.max(previewBox.y1, previewBox.y2);
-            //TODO: FIX lines being aligned when drawn
+
             List<PersistentLines> box = new ArrayList<>();
 
             box.add(new PersistentLines(left, top, right, top, pixelSize, ColorPicker.getIntColor()));
@@ -378,7 +349,6 @@ public class Drawing extends Screen {
             drawStack.add(new BoxCommand(box));
         }
         if (isInCanvas(mouseX, mouseY) && currentTool == Tool.CIRCLE) {
-            //works jsut need to add preview and circle drawing logic
 
             List<Pixel> circle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
             drawStack.add(new CircleCommand(circle));
@@ -429,8 +399,7 @@ public class Drawing extends Screen {
         }).dimensions(40, 40, 120, 20).build();
         addDrawableChild(toggleButton);
 
-
-        //this is really disgusting with perma typecasting, probably make it more clean later
+        //Draw parts of the ColorPicker
         AlphaSlider alphaSlider = new AlphaSlider(width-100,20,100,20, Text.literal("Alpha: " + (int)(ColorPicker.alpha*255)), ColorPicker.alpha);
         addDrawableChild(alphaSlider);
 
@@ -459,7 +428,7 @@ public class Drawing extends Screen {
         drawSquare(context, x, y, x + w, y + h, color);
 
 
-        //draw the already drew elements first then previewline/box/circle
+        //Draw all elements THEN the previewShape
         for (DrawCommand cmd: drawStack) {
             cmd.draw(context);
         }
@@ -485,7 +454,7 @@ public class Drawing extends Screen {
             //kinda scuffed preview circle shifting around if you move mouse backwards but it works
             for (Pixel p : previewCircle) {
 
-                context.fill(p.x, p.y, p.x+p.size, p.y+p.size, p.colour);
+                context.fill(p.x, p.y, p.x+p.size, p.y+p.size, p.color);
 
             }
         }
@@ -493,7 +462,6 @@ public class Drawing extends Screen {
         //render all tool icons here
         renderToolIcons(context);
 
-        //(probably)render color picker here
     }
 
 
@@ -591,7 +559,6 @@ public class Drawing extends Screen {
             plotPoints(xc,  yc,  curX,  curY, circle);
         }
 
-        //drawnCircles.add(circle);
         return circle;
 
 
