@@ -75,7 +75,9 @@ public class Drawing extends Screen {
                 }
             }
 
-            if (remainingEdges.isEmpty()) return new ArrayList<>();
+            if (remainingEdges.isEmpty()) {
+                return new ArrayList<>();
+            }
 
             BoxCommand updatedBox = new BoxCommand(new ArrayList<>()); // empty constructor
             updatedBox.edges = remainingEdges;
@@ -117,7 +119,7 @@ public class Drawing extends Screen {
 
         @Override
         public List<DrawCommand> eraseAt(double x, double y, double r) {
-            pixels.removeIf(p -> Math.hypot(p.x - x, p.y - y) <= r);
+            pixels.removeIf(p -> Math.hypot(p.x - x, p.y - y) <= r); //if point is within the circle radius of point it gets removed
             return pixels.isEmpty() ? new ArrayList<>() : List.of(this);
         }
     }
@@ -198,6 +200,13 @@ public class Drawing extends Screen {
     // Event handling
     // ===============================
 
+    /**
+     * Called when mouseclicked, applying appropriate pixel strokes and setting globals.
+     * @param mouseX
+     * @param mouseY
+     * @param button
+     * @return
+     */
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0 && isInCanvas(mouseX, mouseY)) {
@@ -208,11 +217,29 @@ public class Drawing extends Screen {
         } else {
             onCanvas = false;
         }
+        if(isInCanvas(mouseX+pixelSize, mouseY+pixelSize) && isMouseDown) {
+            if (currentTool == Tool.PAINTBRUSH || currentTool == Tool.PENCIL){
+
+                List<Pixel> stroke = new ArrayList<>();
+                stroke.add(new Pixel((int)mouseX, (int)mouseY, ColorPicker.getIntColor(), pixelSize));
+                drawStack.add(new PixelCommand(stroke));
+
+            }
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
 
     // EraseAt+trimLine method from GPT
+
+    /**
+     * Erases part of a line if it overlaps with provided circle (cx,cy,r) and returns the new line(s)
+     * @param line
+     * @param cx
+     * @param cy
+     * @param r
+     * @return
+     */
     private List<PersistentLines> trimLineWithCircle(PersistentLines line, double cx, double cy, double r) {
         double x1 = line.x1;
         double y1 = line.y1;
@@ -269,6 +296,22 @@ public class Drawing extends Screen {
 
         return result;
     }
+
+    /**
+     * Handles mouse dragged events over the canvas
+     * Paintbrush - draws pixels at current position (mouseX, mouseY) with size = pixelSize
+     * Pencil - draws pixels at current position (mouseX, mouseY) with size always = 1
+     * Eraser - removes pixels that intersect at current position (mouseX, mouseY)
+     * Line - updates a preview line from the drag start to current position (mouseX, mouseY)
+     * Square - updates a preview rectangle bounded by the drag start to current position (mouseX, mouseY)
+     * Circle - updates a preview circle bounded by the drag start to current position (mouseX, mouseY)
+     * @param mouseX - current x coordinate of the mouse
+     * @param mouseY - current y coordinate of the mouse
+     * @param button - mouse button being held
+     * @param deltaX - change in x since last mouseDragged event
+     * @param deltaY - change in y since last mouseDragged event
+     * @return
+     */
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if(isInCanvas(mouseX+pixelSize, mouseY+pixelSize) && isMouseDown) {
@@ -317,6 +360,17 @@ public class Drawing extends Screen {
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
+    /**
+     * Completes the drawing operation on mouse button released
+     *
+     * Adds any previewed shape (line, square, circle) to the draw stack if released within the canvas.
+     * Discards the previewed shape if released outside the canvas.
+     *
+     * @param mouseX - current x coordinate of the mouse
+     * @param mouseY - current y coordinate of the mouse
+     * @param button - mouse button being released
+     * @return
+     */
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         isMouseDown = false;
@@ -360,6 +414,9 @@ public class Drawing extends Screen {
     // GUI Setup
     // ===============================
 
+    /**
+     * Sets up the window, drawing elements and ensuring previews are null to start.
+     */
     @Override
     protected void init() {
         //clear boxes
@@ -414,6 +471,14 @@ public class Drawing extends Screen {
     // Rendering
     // ===============================
 
+    /**
+     * Draws the shapes from the drawStack to the screen every frame.
+     *
+     * @param context current DrawContext (current screen)
+     * @param mouseX - current x coordinate of the mouse
+     * @param mouseY - current y coordinate of the mouse
+     * @param delta - (TODO: look into what the delta is in render)
+     */
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
@@ -460,11 +525,14 @@ public class Drawing extends Screen {
         }
 
         //render all tool icons here
-        renderToolIcons(context);
+        //renderToolIcons(context);
 
     }
 
-
+    /**
+     * Renders all the drawing tool icons to the current screen
+     * @param context - DrawContext (current screen)
+     */
     private void renderToolIcons(DrawContext context) {
         int texWidth = 32;
         int texHeight = 32;
@@ -496,17 +564,17 @@ public class Drawing extends Screen {
     // ===============================
 
     /**
-     * Interpolates extra drawn pixels between 2 points (smoother drawing)
-     * @param x0
-     * @param y0
+     * Interpolates extra drawn pixels between 2 points (x1,y1), (x2,y2) (smoother drawing)
      * @param x1
      * @param y1
+     * @param x2
+     * @param y2
      * @param color
      * @param size
      */
-    private void drawInterpolated(double x0, double y0, double x1, double y1, int color, int size, List<Pixel> lp) {
-        double dx = x1 - x0;
-        double dy = y1 - y0;
+    private void drawInterpolated(double x1, double y1, double x2, double y2, int color, int size, List<Pixel> lp) {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
         double dist = Math.hypot(dx, dy); // sqrt(dx^2 + dy^2)
 
         // spacing controls smoothness
@@ -516,81 +584,118 @@ public class Drawing extends Screen {
 
         for (int i = 0; i <= steps; i++) {
             double t = (double) i / steps;
-            int x = (int) (x0 + dx * t);
-            int y = (int) (y0 + dy * t);
+            int x = (int) (x1 + dx * t);
+            int y = (int) (y1 + dy * t);
             lp.add(new Pixel(x, y, color, size));
         }
     }
-    private void plotPoints(int xc, int yc, int x, int y, List<Pixel> circle) {
-        circle.add(new Pixel(xc+x, yc+y, ColorPicker.getIntColor(), pixelSize));
-        circle.add(new Pixel(xc-x, yc+y, ColorPicker.getIntColor(), pixelSize));
-        circle.add(new Pixel(xc+x, yc-y, ColorPicker.getIntColor(), pixelSize));
-        circle.add(new Pixel(xc-x, yc-y, ColorPicker.getIntColor(), pixelSize));
-        circle.add(new Pixel(xc+y, yc+x, ColorPicker.getIntColor(), pixelSize));
-        circle.add(new Pixel(xc-y, yc+x, ColorPicker.getIntColor(), pixelSize));
-        circle.add(new Pixel(xc+y, yc-x, ColorPicker.getIntColor(), pixelSize));
-        circle.add(new Pixel(xc-y, yc-x, ColorPicker.getIntColor(), pixelSize));
-    }
-    private List<Pixel> drawCircle(double x0, double y0, double x1, double y1, int size, int color) {
-        List<Pixel> circle = new ArrayList<>();
-        double left   = Math.min(x0, x1);
-        double right  = Math.max(x0, x1);
-        double top    = Math.min(y0, y1);
-        double bottom = Math.max(y0, y1);
 
-        int  width  = (int) (right - left);
+
+    /**
+     * Helper method for adding points to the drawn circle
+     * @param xc
+     * @param yc
+     * @param x
+     * @param y
+     * @param size
+     * @param color
+     * @param circle
+     */
+    private void plotPoints(int xc, int yc, int x, int y, int size, int color, List<Pixel> circle) {
+        circle.add(new Pixel(xc+x, yc+y, color, size));
+        circle.add(new Pixel(xc-x, yc+y, color, size));
+        circle.add(new Pixel(xc+x, yc-y, color, size));
+        circle.add(new Pixel(xc-x, yc-y, color, size));
+        circle.add(new Pixel(xc+y, yc+x, color, size));
+        circle.add(new Pixel(xc-y, yc+x, color, size));
+        circle.add(new Pixel(xc+y, yc-x, color, size));
+        circle.add(new Pixel(xc-y, yc-x, color, size));
+    }
+
+    /**
+     * Draws circle using the Bresenham Circle Algorithm, adding the points to an array to be drawn
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param size
+     * @param color
+     * @return
+     */
+    private List<Pixel> drawCircle(double x1, double y1, double x2, double y2, int size, int color) {
+        List<Pixel> circle = new ArrayList<>();
+
+        double left   = Math.min(x1, x2);
+        double right  = Math.max(x1, x2);
+        double top    = Math.min(y1, y2);
+        double bottom = Math.max(y1, y2);
+
+        int width  = (int) (right - left);
         int height = (int) (bottom - top);
 
-        //what am i writing
-        int xc = ((int)x0+(int)x1)/2;
-        int yc = ((int)y0+(int)y1)/2;
-        int r =   Math.min(width, height)/2;
+        // center of the bounding box
+        int xc = ((int) x1 + (int) x2) / 2;
+        int yc = ((int) y1 + (int) y2) / 2;
+
+        int r = Math.min(width, height) / 2;
+
         int curX = 0;
         int curY = r;
-        int d= 3-2*r;
+        int d = 3 - 2 * r;
+
         while (curY >= curX) {
+            plotPoints(xc, yc, curX, curY, size, color, circle);
+
             if (d > 0) {
                 curY--;
-                d = d + 4 * (curX - curY) +10;
+                d += 4 * (curX - curY) + 10;
             } else {
-                d = d + 4 * curX + 6;
+                d += 4 * curX + 6;
             }
             curX++;
-            plotPoints(xc,  yc,  curX,  curY, circle);
         }
 
         return circle;
-
-
     }
+
+    /**
+     * Draws line from x1,y1 to x2,y2 using Bresenham's Line algorithm
+     * @param context
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param width
+     * @param color
+     */
     public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, int width, int color) {
-        int ix1 = Math.round(x1);
-        int iy1 = Math.round(y1);
-        int ix2 = Math.round(x2);
-        int iy2 = Math.round(y2);
+        int intx1 = Math.round(x1);
+        int inty1 = Math.round(y1);
+        int intx2 = Math.round(x2);
+        int inty2 = Math.round(y2);
 
-        int dx = Math.abs(ix2 - ix1);
-        int dy = Math.abs(iy2 - iy1);
+        int dx = Math.abs(intx2 - intx1);
+        int dy = Math.abs(inty2 - inty1);
 
-        int sx = ix1 < ix2 ? 1 : -1;
-        int sy = iy1 < iy2 ? 1 : -1;
+        int sx = intx1 < intx2 ? 1 : -1; //step in x direction (go back or forward 1)
+        int sy = inty1 < inty2 ? 1 : -1; //step in y direction (go back or forward 1)
 
         int err = dx - dy;
 
         while (true) {
             // Draw a small square centered on the current point to simulate line width
             int half = width / 2;
-            context.fill(ix1 - half, iy1 - half, ix1 + half + 1, iy1 + half + 1, color);
+            context.fill(intx1 - half, inty1 - half, intx1 + half + 1, inty1 + half + 1, color);
 
-            if (ix1 == ix2 && iy1 == iy2) break;
+            if (intx1 == intx2 && inty1 == inty2) break;
             int e2 = 2 * err;
             if (e2 > -dy) {
                 err -= dy;
-                ix1 += sx;
+                intx1 += sx;
             }
             if (e2 < dx) {
                 err += dx;
-                iy1 += sy;
+                inty1 += sy;
             }
         }
     }
