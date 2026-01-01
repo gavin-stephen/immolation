@@ -21,7 +21,12 @@ public class ColorPicker extends ClickableWidget {
     private int lastPosX;
     private int lastPosY;
     public ColorPicker(int x, int y, int width, int height, Text text) {
+
+
         super(x,y,width,height,text);
+        saturation = 0f;
+        brightness = 1f;
+        alpha = 1f;
 
     }
     public Color getColor() {
@@ -32,6 +37,8 @@ public class ColorPicker extends ClickableWidget {
     }
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        //Ensure colors do not persist between loads
+
 
         //TODO:create a box with horizontal gradient white -> color, also has vertical gradient from black bottom -> transparent white top
         //https://github.com/Wynntils/Wynntils/blob/main/common/src/main/java/com/wynntils/screens/colorpicker/widgets/SaturationBrightnessWidget.java

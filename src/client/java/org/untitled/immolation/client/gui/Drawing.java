@@ -236,12 +236,26 @@ public class Drawing extends Screen {
             onCanvas = false;
         }
         if(isInCanvas(mouseX+pixelSize, mouseY+pixelSize) && isMouseDown) {
-            if (currentTool == Tool.PAINTBRUSH || currentTool == Tool.PENCIL){
+            //Ensures that you can erase/paint single pixels from a still mouse click
+            if (currentTool == Tool.PAINTBRUSH){
 
                 List<Pixel> stroke = new ArrayList<>();
                 stroke.add(new Pixel((int)mouseX, (int)mouseY, ColorPicker.getIntColor(), pixelSize));
                 drawStack.add(new PixelCommand(stroke));
 
+            }
+            if (currentTool == Tool.PENCIL) {
+                List<Pixel> stroke = new ArrayList<>();
+                stroke.add(new Pixel((int)mouseX, (int)mouseY, ColorPicker.getIntColor(), 1));
+                drawStack.add(new PixelCommand(stroke));
+            }
+            if (currentTool == Tool.ERASER) {
+                List<DrawCommand> newStack = new ArrayList<>();
+                for (DrawCommand cmd : drawStack) {
+                    newStack.addAll(cmd.eraseAt( (int) mouseX, (int) mouseY, pixelSize));
+                }
+                drawStack.clear();
+                drawStack.addAll(newStack);
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -482,6 +496,10 @@ public class Drawing extends Screen {
         addDrawableChild(hueSlider);
 
         ColorPicker colorPicker = new ColorPicker(width-100, 40, 100, 40, Text.literal("test"));
+        //Ensure the ColorPicker gets reset back to white on load.
+        ColorPicker.saturation = 0f;
+        ColorPicker.brightness = 1f;
+        ColorPicker.alpha = 1f;
         addDrawableChild(colorPicker);
     }
 
