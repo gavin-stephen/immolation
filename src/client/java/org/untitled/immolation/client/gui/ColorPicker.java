@@ -16,14 +16,13 @@ public class ColorPicker extends ClickableWidget {
     public static float hue;
     public static float saturation = 0f;
     public static float brightness = 1f;
-    public static float alpha;
+    public static float alpha = 1f;
 
     private int lastPosX;
     private int lastPosY;
     public ColorPicker(int x, int y, int width, int height, Text text) {
         super(x,y,width,height,text);
 
-        System.out.println("ok");
     }
     public Color getColor() {
         return new Color(hue, saturation, brightness, alpha);

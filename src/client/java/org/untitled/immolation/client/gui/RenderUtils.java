@@ -149,6 +149,16 @@ public class RenderUtils {
     } // for now call with RenderUtils.fillGradient(context,500,500,900,900, Integer.parseInt("FFFF00", 16), Integer.parseInt("800080", 16));
     //TODO: set up CustomColor usage within Drawing tomorrow
 
+    /**
+     * Draws a gradient from left to right in a rectangle
+     * @param context - DrawContext (current screen)
+     * @param x1 -
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param color1
+     * @param color2
+     */
     public static void fillSidewaysGradient(DrawContext context, float x1, float y1, float x2, float y2, int color1, int color2) {
         MatrixStack matrix = context.getMatrices();
         BufferBuilder buffer = getBufferBuilder(matrix, VertexFormat.DrawMode.QUADS);
