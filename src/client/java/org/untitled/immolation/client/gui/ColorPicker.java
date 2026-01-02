@@ -33,18 +33,12 @@ public class ColorPicker extends ClickableWidget {
         return new Color(hue, saturation, brightness, alpha);
     }
     public static int getIntColor() {
-        return java.awt.Color.HSBtoRGB(hue, saturation, brightness);
+        int rgb = java.awt.Color.HSBtoRGB(hue, saturation, brightness) & 0x00FFFFFF; //capture only rgb value (0 for alpha)
+        int a = (int) (alpha * 255);
+        return (a << 24) | rgb;
     }
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        //Ensure colors do not persist between loads
-
-
-        //TODO:create a box with horizontal gradient white -> color, also has vertical gradient from black bottom -> transparent white top
-        //https://github.com/Wynntils/Wynntils/blob/main/common/src/main/java/com/wynntils/screens/colorpicker/widgets/SaturationBrightnessWidget.java
-
-//        AlphaSlider alphaSlider = new AlphaSlider(400,700,200,20, Text.literal("alpha"), 0);
-//        addDrawableChild(alphaSlider);
         int x = getX();
         int y = getY();
 
