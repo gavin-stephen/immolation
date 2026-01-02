@@ -22,10 +22,10 @@ public class Drawing extends Screen {
 
     //drawStack stores all drawing commands in order(e.g Draw a line, draw a box, draw a circle)
     private final List<DrawCommand> drawStack = new ArrayList<>();
-
-    private static PersistentLines previewLine = null;
-    private static PersistentLines previewBox = null; // to be used in Square tool
-    private static List<Pixel> previewCircle = null;
+    private static Pixel hoverBorder = null;
+    private static LineCommand previewLine = null;
+    private static BoxCommand previewBox = null; // to be used in Square tool
+    private static CircleCommand previewCircle = null;
 
     private boolean onCanvas = false;
 
@@ -67,7 +67,23 @@ public class Drawing extends Screen {
         @Override
         public void draw(DrawContext context) {
             for (Pixel p : pixels) {
-                context.fill(p.x, p.y, p.x + p.size, p.y + p.size, p.color);
+                //ensure integer division does not result in a 0 width for pixel size = 1
+//                int half = p.size/2;
+//                int leftX = p.x - half;
+//                int leftY = p.y - half;
+//                int rightX = p.x + p.size;
+//                int rightY = p.y + p.size;
+                int half = p.size / 2;
+                int leftX = Math.max(p.x - half, canvasX());
+                int leftY = Math.max(p.y - half, canvasY());
+                int rightX = Math.min(p.x + p.size, canvasX()+canvasWidth()); //to ensure width=1 still shows up
+                int rightY  = Math.min(p.y + p.size, canvasY()+canvasHeight());
+                if (leftX<rightX && leftY<rightY) {
+                    context.fill(leftX,leftY,rightX,rightY, p.color);
+                }
+
+                //context.fill(p.x, p.y, p.x + p.size, p.y + p.size, p.color);
+
             }
         }
 
@@ -133,6 +149,7 @@ public class Drawing extends Screen {
         public void draw(DrawContext context) {
             for (Pixel p : pixels) {
                 context.fill(p.x(), p.y(), p.x() + 1, p.y() + 1, p.color());
+
             }
         }
 
@@ -197,8 +214,8 @@ public class Drawing extends Screen {
     }
 
     private boolean isInCanvas(double mx, double my) {
-        return mx >= canvasX() && mx <= canvasX() + canvasWidth() &&
-                my >= canvasY() && my <= canvasY() + canvasHeight();
+        return mx >= canvasX() && mx < canvasX() + canvasWidth() &&
+                my >= canvasY() && my < canvasY() + canvasHeight();
     }
 
     private int clampCanvasX(double mx) {
@@ -213,6 +230,27 @@ public class Drawing extends Screen {
         int dx = x1 - x2;
         int dy = y1 - y2;
         return dx * dx + dy * dy;
+    }
+    private boolean rectInsideCanvas(int x1, int y1, int x2, int y2) {
+        int half = pixelSize / 2;
+
+        int left   =  x1 - half;
+        int top    =  y1 - half;
+        int right  = x2 + half + 1;
+        int bottom = y2 + half + 1;
+
+        return left>= canvasX()
+                && top >= canvasY()
+                && right <= canvasX() + canvasWidth()
+                && bottom <= canvasY() + canvasHeight();
+    }
+    private void cancelActiveTool() {
+        isMouseDown = false;
+        onCanvas = false;
+
+        previewLine = null;
+        previewBox = null;
+        previewCircle = null;
     }
     // ===============================
     // Event handling
@@ -235,7 +273,9 @@ public class Drawing extends Screen {
         } else {
             onCanvas = false;
         }
-        if(isInCanvas(mouseX+pixelSize, mouseY+pixelSize) && isMouseDown) {
+        //int half = pixelSize/2;
+        //add half because pixel is drawn centered at mouseX,mouseY
+        if((isInCanvas(mouseX+pixelSize,mouseY+pixelSize) || isInCanvas(mouseX-pixelSize, mouseY-pixelSize)) && isMouseDown) {
             //Ensures that you can erase/paint single pixels from a still mouse click
             if (currentTool == Tool.PAINTBRUSH){
 
@@ -329,6 +369,17 @@ public class Drawing extends Screen {
         return result;
     }
 
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+//        if (!isInCanvas(mouseX, mouseY)) {
+//            if (isMouseDown) {
+//                cancelActiveTool();
+//            }
+//        }
+        //TODO: figure out how to do clipping and make global states more consistent
+        super.mouseMoved(mouseX, mouseY);
+    }
+
     /**
      * Handles mouse dragged events over the canvas
      * Paintbrush - draws pixels at current position (mouseX, mouseY) with size = pixelSize
@@ -346,10 +397,11 @@ public class Drawing extends Screen {
      */
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if(isInCanvas(mouseX+pixelSize, mouseY+pixelSize) && isMouseDown) {
+        if(isInCanvas(mouseX, mouseY) && isMouseDown) {
             if (currentTool == Tool.PAINTBRUSH){
 
                 List<Pixel> stroke = new ArrayList<>();
+
                 stroke.add(new Pixel((int)mouseX, (int)mouseY, ColorPicker.getIntColor(), pixelSize));
                 drawStack.add(new PixelCommand(stroke));
 
@@ -364,31 +416,48 @@ public class Drawing extends Screen {
 
             }
         }
-        if (isInCanvas(mouseX, mouseY) && isMouseDown) {
+        //shouldnt need the incanvas check for dragging mouse (should be handled by command class)
+        //if (isInCanvas(mouseX, mouseY) && isMouseDown) {
             if (currentTool == Tool.LINE) {
                 int clampedX = clampCanvasX(mouseX);
                 int clampedY = clampCanvasY(mouseY);
-                previewLine = new PersistentLines((int) x, (int) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor());
+                previewLine = new LineCommand(new PersistentLines((int) x, (int) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor()));
             }
             if (currentTool == Tool.ERASER) {
-                //TODO: ERASING WITH SMALLER SIZE THAN DRAWN PIXELS IS INSANELY SCUFFED (JUST WORKS ON TOP LEFT CORNER)
+
                 List<DrawCommand> newStack = new ArrayList<>();
                 for (DrawCommand cmd : drawStack) {
                     newStack.addAll(cmd.eraseAt( (int) mouseX, (int) mouseY, pixelSize));
                 }
                 drawStack.clear();
                 drawStack.addAll(newStack);
-                //eraseAt(mouseX, mouseY);
+
             }
             if (currentTool == Tool.SQUARE ) {
-                int clampedX = clampCanvasX(mouseX);
-                int clampedY = clampCanvasY(mouseY);
-                previewBox = new PersistentLines((int) x,(int) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor());
+
+                int left = (int)Math.min(x, mouseX);
+                int top = (int)Math.min(y, mouseY);
+                int right = (int)Math.max(x, mouseX);
+                int bottom = (int)Math.max(y, mouseY);
+                List<PersistentLines> newBox = new ArrayList<>();
+                PersistentLines topHorizontal = new PersistentLines(left, top, right, top, pixelSize, ColorPicker.getIntColor());
+                PersistentLines bottomHorizontal = new PersistentLines(left, bottom, right, bottom, pixelSize, ColorPicker.getIntColor());
+                PersistentLines leftVertical = new PersistentLines(left, top, left, bottom, pixelSize, ColorPicker.getIntColor());
+                PersistentLines rightVertical = new PersistentLines(right, top, right, bottom, pixelSize, ColorPicker.getIntColor());
+
+                newBox.add(topHorizontal);
+                newBox.add(bottomHorizontal);
+                newBox.add(leftVertical);
+                newBox.add(rightVertical);
+
+                previewBox = new BoxCommand(newBox);
+                //previewBox = new BoxCommand(new PersistentLines(x, y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor()));
             }
             if (currentTool == Tool.CIRCLE) {
-                previewCircle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
+                List<Pixel> circle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
+                previewCircle = new CircleCommand(circle);
             }
-        }
+        //}
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
@@ -406,39 +475,32 @@ public class Drawing extends Screen {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         isMouseDown = false;
-        //mostly works
-        if (this.client != null && !isInCanvas(mouseX, mouseY))  {
+        if (onCanvas) { //only allow if the initial drawing was started WITHIN canvas
 
-            previewLine = null; //remove previewline it shouldnt matter tho bc it has explicit checking in draw
-            previewBox = null;
-            previewCircle = null;
-        }
-        if (isInCanvas(mouseX,mouseY) && currentTool == Tool.LINE && onCanvas) {
             int clampedX = clampCanvasX(mouseX);
             int clampedY = clampCanvasY(mouseY);
-            drawStack.add(new LineCommand(new PersistentLines((int) x, (int) y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor())));
 
+            if (currentTool == Tool.LINE) {
+                drawStack.add(new LineCommand(
+                        new PersistentLines(x, y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor())
+                ));
+                previewLine = null;
+            }
+
+            if (currentTool == Tool.SQUARE && previewBox != null) {
+
+                drawStack.add(previewBox);
+
+                previewBox = null;
+            }
+
+            if (currentTool == Tool.CIRCLE && previewCircle != null) {
+                List<Pixel> circle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
+                drawStack.add(new CircleCommand(circle));
+                previewCircle = null;
+            }
         }
-        if (isInCanvas(mouseX,mouseY) && currentTool == Tool.SQUARE && onCanvas) {
 
-            int left = Math.min(previewBox.x1, previewBox.x2);
-            int top = Math.min(previewBox.y1, previewBox.y2);
-            int right = Math.max(previewBox.x1, previewBox.x2);
-            int bottom = Math.max(previewBox.y1, previewBox.y2);
-
-            List<PersistentLines> box = new ArrayList<>();
-
-            box.add(new PersistentLines(left, top, right, top, pixelSize, ColorPicker.getIntColor()));
-            box.add(new PersistentLines(left, bottom, right, bottom, pixelSize, ColorPicker.getIntColor()));
-            box.add(new PersistentLines(left, top, left, bottom, pixelSize, ColorPicker.getIntColor()));
-            box.add(new PersistentLines(right, top, right, bottom, pixelSize, ColorPicker.getIntColor()));
-            drawStack.add(new BoxCommand(box));
-        }
-        if (isInCanvas(mouseX, mouseY) && currentTool == Tool.CIRCLE) {
-
-            List<Pixel> circle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
-            drawStack.add(new CircleCommand(circle));
-        }
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
@@ -461,7 +523,7 @@ public class Drawing extends Screen {
 
 
         //This dynamically changes the size of each pixel,
-        //TODO: ENSURE bigger brush sizes do not go out of bounds (add clipping)
+
         SliderWidget brushSizeSlider = new SliderWidget(0,0,200,20,
                 Text.literal("Brush Size: " + pixelSize),
                 (pixelSize - MIN_BRUSH) / (double)(MAX_BRUSH - MIN_BRUSH)
@@ -480,7 +542,8 @@ public class Drawing extends Screen {
         addDrawableChild(brushSizeSlider);
 
         ButtonWidget toggleButton = ButtonWidget.builder(Text.of("Tool : " + (currentTool)), (button) -> {
-
+            //ensure that the previous tool instantly deactivates
+            cancelActiveTool();
             //goes to next tool when click on button (change later)
             currentTool = nextTool(currentTool);
 
@@ -519,15 +582,12 @@ public class Drawing extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        int x = canvasX();
-        int y = canvasY();
-        int w = canvasWidth();
-        int h = canvasHeight();
         int color = 0x88000000;
 
         // Canvas background
-        drawSquare(context, x, y, x + w, y + h, color);
-
+        //drawSquare(context, x, y, x + w, y + h, color);
+        //
+        context.fill(canvasX(), canvasY(),canvasX()+canvasWidth(),canvasY()+canvasHeight(),color);
 
         //Draw all elements THEN the previewShape
         for (DrawCommand cmd: drawStack) {
@@ -535,31 +595,30 @@ public class Drawing extends Screen {
         }
 
         if (previewLine != null) {
-            drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, (int) previewLine.width, previewLine.color);
+            previewLine.draw(context);
+            //drawLine(context, previewLine.x1, previewLine.y1, previewLine.x2, previewLine.y2, (int) previewLine.width, previewLine.color);
         }
         //draw square if square tool
         if (previewBox != null) {
 
-            float left = Math.min(previewBox.x1, previewBox.x2);
-            float top = Math.min(previewBox.y1, previewBox.y2);
-            float right = Math.max(previewBox.x1, previewBox.x2);
-            float bottom = Math.max(previewBox.y1, previewBox.y2);
-
-            drawLine(context, left, top, right, top, (int) previewBox.width, previewBox.color);
-            drawLine(context, left, bottom, right, bottom, (int) previewBox.width, previewBox.color);
-            drawLine(context, left, top, left, bottom, (int) previewBox.width, previewBox.color);
-            drawLine(context, right, top, right, bottom, (int) previewBox.width, previewBox.color);
+            previewBox.draw(context);
 
         }
         if (previewCircle != null) {
             //kinda scuffed preview circle shifting around if you move mouse backwards but it works
-            for (Pixel p : previewCircle) {
-
-                context.fill(p.x, p.y, p.x+p.size, p.y+p.size, p.color);
-
-            }
+            previewCircle.draw(context);
         }
+        if (hoverBorder != null && isInCanvas(mouseX,mouseY)) {
+            //this makes me wonder if i did it wrong? Should i have centered it from the beginning
+            int half = pixelSize/2;
+            int leftX = hoverBorder.x - half ;
+            int leftY = hoverBorder.y - half ;
+            int rightX = hoverBorder.x + hoverBorder.size;
+            int rightY = hoverBorder.y + hoverBorder.size;
 
+
+            context.fill(leftX, leftY, rightX, rightY, hoverBorder.color);
+        }
         //render all tool icons here
         //renderToolIcons(context);
 
@@ -735,7 +794,7 @@ public class Drawing extends Screen {
             }
         }
     }
-    public static List<Pixel> lineToPixels(int x1, int y1, int x2, int y2, int width, int color) {
+    public List<Pixel> lineToPixels(int x1, int y1, int x2, int y2, int width, int color) {
         List<Pixel> out = new ArrayList<>();
 
         int dx = Math.abs(x2 - x1);
@@ -751,7 +810,10 @@ public class Drawing extends Screen {
             // expand thickness
             for (int ox = -half; ox <= half; ox++) {
                 for (int oy = -half; oy <= half; oy++) {
-                    out.add(new Pixel(x1 + ox, y1 + oy, color, 1));
+                    if (isInCanvas(x1+ox, y1+oy)){
+                        out.add(new Pixel(x1 + ox, y1 + oy, color, 1));
+                    }
+
                 }
             }
 
