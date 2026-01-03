@@ -214,8 +214,10 @@ public class Drawing extends Screen {
     }
 
     private boolean isInCanvas(double mx, double my) {
-        return mx >= canvasX() && mx < canvasX() + canvasWidth() &&
-                my >= canvasY() && my < canvasY() + canvasHeight();
+        return mx >= canvasX() &&
+                mx < canvasX() + canvasWidth() &&
+                my >= canvasY() &&
+                my < canvasY() + canvasHeight();
     }
 
     private int clampCanvasX(double mx) {
@@ -454,7 +456,7 @@ public class Drawing extends Screen {
                 //previewBox = new BoxCommand(new PersistentLines(x, y, clampedX, clampedY, pixelSize, ColorPicker.getIntColor()));
             }
             if (currentTool == Tool.CIRCLE) {
-                List<Pixel> circle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
+                List<Pixel> circle = drawCircleClipped(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
                 previewCircle = new CircleCommand(circle);
             }
         //}
@@ -495,7 +497,7 @@ public class Drawing extends Screen {
             }
 
             if (currentTool == Tool.CIRCLE && previewCircle != null) {
-                List<Pixel> circle = drawCircle(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
+                List<Pixel> circle = drawCircleClipped(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
                 drawStack.add(new CircleCommand(circle));
                 previewCircle = null;
             }
@@ -697,14 +699,36 @@ public class Drawing extends Screen {
      * @param circle
      */
     private void plotPoints(int xc, int yc, int x, int y, int size, int color, List<Pixel> circle) {
-        circle.add(new Pixel(xc+x, yc+y, color, size));
-        circle.add(new Pixel(xc-x, yc+y, color, size));
-        circle.add(new Pixel(xc+x, yc-y, color, size));
-        circle.add(new Pixel(xc-x, yc-y, color, size));
-        circle.add(new Pixel(xc+y, yc+x, color, size));
-        circle.add(new Pixel(xc-y, yc+x, color, size));
-        circle.add(new Pixel(xc+y, yc-x, color, size));
-        circle.add(new Pixel(xc-y, yc-x, color, size));
+        //this is so disgusting... clean this up another day
+        //what did i write??? it works atleast
+        if (isInCanvas(xc+x, yc+y) && isInCanvas(xc+x+size-1, yc+y+size-1)) {
+            circle.add(new Pixel(xc+x, yc+y, color, size));
+        }
+        if (isInCanvas(xc-x, yc+y) && isInCanvas(xc-x+size-1, yc+y+size-1)) {
+            circle.add(new Pixel(xc-x, yc+y, color, size));
+        }
+        if (isInCanvas(xc+x, yc-y) && isInCanvas(xc+x+size-1, yc-y+size-1)) {
+            circle.add(new Pixel(xc+x, yc-y, color, size));
+        }
+        if (isInCanvas(xc-x, yc-y) && isInCanvas(xc-x+size-1, yc-y+size-1)) {
+            circle.add(new Pixel(xc-x, yc-y, color, size));
+        }
+        if (isInCanvas(xc+y, yc+x) && isInCanvas(xc+y+size-1, yc+x+size-1)) {
+            circle.add(new Pixel(xc+y, yc+x, color, size));
+        }
+        if (isInCanvas(xc-y, yc+x) && isInCanvas(xc-y+size-1, yc+x+size-1)) {
+            circle.add(new Pixel(xc-y, yc+x, color, size));
+        }
+        if (isInCanvas(xc+y, yc-x) && isInCanvas(xc+y+size-1, yc-x+size-1)) {
+
+            circle.add(new Pixel(xc+y, yc-x, color, size));
+        }
+        if (isInCanvas(xc-y, yc-x) && isInCanvas(xc-y+size-1, yc-x+size-1)) {
+
+            circle.add(new Pixel(xc-y, yc-x, color, size));
+        }
+
+
     }
 
     /**
@@ -717,7 +741,7 @@ public class Drawing extends Screen {
      * @param color
      * @return
      */
-    private List<Pixel> drawCircle(double x1, double y1, double x2, double y2, int size, int color) {
+    private List<Pixel> drawCircleClipped(double x1, double y1, double x2, double y2, int size, int color) {
         List<Pixel> circle = new ArrayList<>();
 
         double left   = Math.min(x1, x2);
