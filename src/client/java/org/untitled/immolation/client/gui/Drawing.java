@@ -8,6 +8,7 @@ import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class Drawing extends Screen {
     private static record Pixel(int x, int y, int color, int size) {}
 
     //drawStack stores all drawing commands in order(e.g Draw a line, draw a box, draw a circle)
+    private final List<DrawCommand> redoLog = new ArrayList<>();
     private final List<DrawCommand> drawStack = new ArrayList<>();
     private static Pixel hoverBorder = null;
     private static LineCommand previewLine = null;
@@ -303,9 +305,24 @@ public class Drawing extends Screen {
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (hasControlDown() && keyCode == GLFW.GLFW_KEY_Z) {
+            if (!drawStack.isEmpty()) {
+                redoLog.add(drawStack.removeLast());
+            }
+
+        }
+        if (hasControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
+            if (!redoLog.isEmpty()) {
+                drawStack.addLast(redoLog.removeLast());
+            }
+
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
 
     // EraseAt+trimLine method from GPT
-
     /**
      * Erases part of a line if it overlaps with provided circle (cx,cy,r) and returns the new line(s)
      * @param line
@@ -420,6 +437,7 @@ public class Drawing extends Screen {
         }
         //shouldnt need the incanvas check for dragging mouse (should be handled by command class)
         //if (isInCanvas(mouseX, mouseY) && isMouseDown) {
+        if (onCanvas) { //ensures that the last mouse down was within the canvas (currently drawing)
             if (currentTool == Tool.LINE) {
                 int clampedX = clampCanvasX(mouseX);
                 int clampedY = clampCanvasY(mouseY);
@@ -429,18 +447,18 @@ public class Drawing extends Screen {
 
                 List<DrawCommand> newStack = new ArrayList<>();
                 for (DrawCommand cmd : drawStack) {
-                    newStack.addAll(cmd.eraseAt( (int) mouseX, (int) mouseY, pixelSize));
+                    newStack.addAll(cmd.eraseAt((int) mouseX, (int) mouseY, pixelSize));
                 }
                 drawStack.clear();
                 drawStack.addAll(newStack);
 
             }
-            if (currentTool == Tool.SQUARE ) {
+            if (currentTool == Tool.SQUARE) {
 
-                int left = (int)Math.min(x, mouseX);
-                int top = (int)Math.min(y, mouseY);
-                int right = (int)Math.max(x, mouseX);
-                int bottom = (int)Math.max(y, mouseY);
+                int left = (int) Math.min(x, mouseX);
+                int top = (int) Math.min(y, mouseY);
+                int right = (int) Math.max(x, mouseX);
+                int bottom = (int) Math.max(y, mouseY);
                 List<PersistentLines> newBox = new ArrayList<>();
                 PersistentLines topHorizontal = new PersistentLines(left, top, right, top, pixelSize, ColorPicker.getIntColor());
                 PersistentLines bottomHorizontal = new PersistentLines(left, bottom, right, bottom, pixelSize, ColorPicker.getIntColor());
@@ -459,6 +477,7 @@ public class Drawing extends Screen {
                 List<Pixel> circle = drawCircleClipped(x, y, mouseX, mouseY, pixelSize, ColorPicker.getIntColor());
                 previewCircle = new CircleCommand(circle);
             }
+        }
         //}
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -701,6 +720,7 @@ public class Drawing extends Screen {
     private void plotPoints(int xc, int yc, int x, int y, int size, int color, List<Pixel> circle) {
         //this is so disgusting... clean this up another day
         //what did i write??? it works atleast
+        //Checks each "pixel(s)" top left and bottom right points to ensure its within the bounds
         if (isInCanvas(xc+x, yc+y) && isInCanvas(xc+x+size-1, yc+y+size-1)) {
             circle.add(new Pixel(xc+x, yc+y, color, size));
         }
